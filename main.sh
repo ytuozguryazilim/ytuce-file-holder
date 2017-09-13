@@ -1,11 +1,9 @@
 #!/bin/bash
 
-# Global Degiskenler
-FLAG=0
+### Global Degiskenler
 MUST_BE_DOWNLOAD=("rar" "pdf")
 EXTENSION=""
-LINK="https://www.ce.yildiz.edu.tr/personal/furkan"
-FileLink=$LINK/file
+LINK="https://www.ce.yildiz.edu.tr/personal/furkan/file"
 
 
 ### Fonksiyonlar
@@ -38,27 +36,35 @@ function parse_link() {
 
 # Gecici dosyalari sil.
 function delete_tmp_file() {
+    echo "[+] delete_tmp_file() fonksiyonu calistirildi."
     rm source.html links.txt 2> /dev/null
+}
+
+# Linkin indirilebilir bir dosya oldugunu kontrol ediyoruz.
+function is_link_a_file() {
+    echo "[+] is_link_a_file() fonksiyonu calistirildi."
+    local flag=0
+    learn_extension_in_string $1
+    for ext in ${MUST_BE_DOWNLOAD[@]}
+    do
+        if test "$ext" = $EXTENSION; then
+            flag=1
+        fi
+    done
+    return $flag
 }
 
 # Main kisim.
 function main() {
     echo "[+] main() fonksiyonu calistirildi."
-    download_source_code $FileLink
-    parse_link $FileLink
+    download_source_code $LINK
+    parse_link $LINK
     # Linkleri kontrol ediyoruz. Eger icinde indirilecek uzanti varsa indiriyoruz.
     # Yoksa icindeki diger linklere gidiyoruz. Suanlik ilk sayfadaki dosyayi indiricez.
     for link in `cat links.txt`
     do
-        learn_extension_in_string $link
-        FLAG=0
-        for ext in ${MUST_BE_DOWNLOAD[@]}
-        do
-            if test "$ext" = $EXTENSION; then
-                FLAG=1
-            fi
-        done
-        if [ "$FLAG" = "1" ]
+        is_link_a_file $link
+        if [ "$?" = "1" ]
         then
             echo "Tmm indir, panpa"
             echo $link
