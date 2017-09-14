@@ -17,29 +17,26 @@ function learn_extension_in_string() {
 function download_source_code() {
     echo "[+] download_source_code() fonksiyonu calistirildi."
     local link=$1
-    wget --no-check-certificate $link -O source.html
+    local path=$2
+    wget --no-check-certificate $link -O $path/source.html
 }
-
 # Pdf, rar dosyasini indir.
 function download_file() {
     echo "[+] download_file() fonksiyonu calistirildi."
     local link=$1
     wget --no-check-certificate $link
 }
-
 # Kaynak Koddan linkleri cikariyoruz.
 function parse_link() {
     echo "[+] parse_link() fonksiyonu calistirildi."
-    local link=$1
-    cat source.html | grep -o "$link.*><div" | sed 's/"><div class="iconimage"><\/div><div//' > links.txt
+    local path=$1
+    cat $path/source.html | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' > $path/links.txt
 }
-
 # Gecici dosyalari sil.
 function delete_tmp_file() {
     echo "[+] delete_tmp_file() fonksiyonu calistirildi."
     rm source.html links.txt 2> /dev/null
 }
-
 # Linkin indirilebilir bir dosya oldugunu kontrol ediyoruz.
 function is_link_a_file() {
     echo "[+] is_link_a_file() fonksiyonu calistirildi."
@@ -60,6 +57,9 @@ function recursive_link_follow() {
     local link=$1
     local path=$2
     echo $link $path
+    download_source_code $link $path
+    parse_link $path
+    cat $path/links.txt
 }
 
 # Main kisim.
