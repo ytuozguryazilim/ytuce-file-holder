@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ### Global Degiskenler
-MUST_BE_DOWNLOAD=("rar" "pdf")
+MUST_BE_DOWNLOAD=("rar" "pdf" "txt" "c" "zip" "gz")
 EXTENSION=""
 LINK="https://www.ce.yildiz.edu.tr/personal/furkan/file"
 SETUPPATH="ceytu"
