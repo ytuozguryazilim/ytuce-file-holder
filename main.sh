@@ -60,6 +60,17 @@ function recursive_link_follow() {
     download_source_code $link $path
     parse_link $path
     cat $path/links.txt
+    for href in $(cat $path/links.txt); do
+        is_link_a_file $href
+        if [ "$?" = "1" ]; then # Demekki indirilebilir dosya.
+            echo "Tmm indir. Panpa! :" $href
+            #download_file $href
+        else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
+            filename=${href##*/}
+            mkdir $path/$filename
+            recursive_link_follow $href $path/$filename
+        fi
+    done
 }
 
 # Main kisim.
@@ -68,7 +79,7 @@ function main() {
     personalname=${LINK##*/}
     mkdir -p ~/$SETUPPATH/$personalname
     recursive_link_follow $LINK/file ~/$SETUPPATH/$personalname
-    delete_tmp_file
+    #delete_tmp_file
 }
 
 main
