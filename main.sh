@@ -3,7 +3,7 @@
 ### Global Degiskenler
 MUST_BE_DOWNLOAD=("rar" "pdf" "txt" "c" "zip" "gz")
 EXTENSION=""
-LINK="https://www.ce.yildiz.edu.tr/personal/furkan/file"
+LINK="https://www.ce.yildiz.edu.tr/personal/furkan"
 SETUPPATH="ceytu"
 
 ### Fonksiyonlar
@@ -61,6 +61,7 @@ function recursive_link_follow() {
     parse_link $path
     cat $path/links.txt
     for href in $(cat $path/links.txt); do
+        # Burda "href" in geri tusu olup olmadigini kontrol etmeliyiz.
         is_link_a_file $href
         if [ "$?" = "1" ]; then # Demekki indirilebilir dosya.
             echo "Tmm indir. Panpa! :" $href
