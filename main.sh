@@ -4,7 +4,7 @@
 MUST_BE_DOWNLOAD=("rar" "pdf")
 EXTENSION=""
 LINK="https://www.ce.yildiz.edu.tr/personal/furkan/file"
-
+SETUPPATH="ceytu"
 
 ### Fonksiyonlar
 # String icinden nokta uzantili uzantiyi cikariyoruz.
@@ -54,23 +54,20 @@ function is_link_a_file() {
     return $flag
 }
 
+# Recursive sekilde linklerin kaynak kodlarindaki linkleri takip edicek.
+function recursive_link_follow() {
+    echo "[+] recursive_link_follow() fonksiyonu calistirildi."
+    local link=$1
+    local path=$2
+    echo $link $path
+}
+
 # Main kisim.
 function main() {
     echo "[+] main() fonksiyonu calistirildi."
-    download_source_code $LINK
-    parse_link $LINK
-    # Linkleri kontrol ediyoruz. Eger icinde indirilecek uzanti varsa indiriyoruz.
-    # Yoksa icindeki diger linklere gidiyoruz. Suanlik ilk sayfadaki dosyayi indiricez.
-    for link in `cat links.txt`
-    do
-        is_link_a_file $link
-        if [ "$?" = "1" ]
-        then
-            echo "Tmm indir, panpa"
-            echo $link
-            download_file $link
-        fi
-    done
+    personalname=${LINK##*/}
+    mkdir -p ~/$SETUPPATH/$personalname
+    recursive_link_follow $LINK/file ~/$SETUPPATH/$personalname
     delete_tmp_file
 }
 
