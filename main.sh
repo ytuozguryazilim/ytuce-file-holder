@@ -79,7 +79,11 @@ function recursive_link_follow() {
 function personalslinks() {
     echo "[+] personalslinks() fonksiyonu calistirildi."
     wget --no-check-certificate $PERSONSLINK -O ~/$SETUPPATH/source.html
-    cat ~/$SETUPPATH/source.html | grep -o "/personal.*><img" | sed 's/"><img//' | sed 's/^/https\:\/\/www\.ce\.yildiz\.edu\.tr/' > ~/$SETUPPATH/personalslinks.txt
+    result=$(cat ~/$SETUPPATH/source.html | grep -o "/personal.*><img" | sed 's/"><img//' | sed 's/^/https\:\/\/www\.ce\.yildiz\.edu\.tr/' )
+    for personal in $result
+    do
+         echo "$personal" >> ~/$SETUPPATH/personalslinks.txt
+    done
 }
 
 # Main kisim.
