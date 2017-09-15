@@ -80,10 +80,16 @@ function recursive_link_follow() {
 function personalslinks() {
     echo "[+] personalslinks() fonksiyonu calistirildi."
     wget --no-check-certificate $PERSONSLINK -O ~/$SETUPPATH/source.html
-    result=$(cat ~/$SETUPPATH/source.html | grep -o "/personal.*><img" | sed 's/"><img//' | sed 's/^/https\:\/\/www\.ce\.yildiz\.edu\.tr/' )
+    result=$(cat ~/$SETUPPATH/source.html | grep -o "/personal.*><img" | sed 's/"><img//' | sed 's/\/personal\///' | sort | uniq )
     for personal in $result
     do
-         echo "$personal" >> ~/$SETUPPATH/personalslinks.txt
+        if [[ " ${NON_PERSONS[*]} " == *"$personal"* ]]
+        then
+            echo "YES, your arr contains $personal"
+        else
+            echo "NO, your arr does not contain $personal"
+            echo $personal | sed 's/^/https\:\/\/www\.ce\.yildiz\.edu\.tr\/personal\//' >> ~/$SETUPPATH/personalslinks.txt
+        fi
     done
 }
 
