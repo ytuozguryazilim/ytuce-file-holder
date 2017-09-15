@@ -3,7 +3,7 @@ Her hocanin dosyalari takip eden ve indiren shell script
 
 ### Task Listesi!!!
 - [X] Repo ismi degistirildi.
-- [ ] Kisiler sayfasini crawler edip, buradaki linkleri "personslinks.txt" dosyasina kaydetmeliyiz, ama bazi isimleri engellenmeli("fkord filiz kazim ekoord ...").
+- [X] Kisiler sayfasini crawler edip, buradaki linkleri "personslinks.txt" dosyasina kaydetmeliyiz, ama bazi isimleri engellenmeli("fkord filiz kazim ekoord ...").
 - [ ] Dongu kurarak tum kisilerin dosyalari takip edilmeli.
 - [ ] "recursive_link_follow()" fonksiyonun icindeki "href" in geri tusu olup olmadigini kontrol etmeliyiz.
 - [ ] Karsilastirma yapilmali. Dosya takip sisteminde yok ise indirilmeli. Dosya var ise ayni isimdeki dosyayla karsilastirilmali(Suanlik dosya boyutuna gore). Farkli ise indirilerek ve dosya isminin sonuna tarih atilmali.
