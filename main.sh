@@ -75,12 +75,21 @@ function recursive_link_follow() {
     done
 }
 
+# Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
+function personalslinks() {
+    echo "[+] personalslinks() fonksiyonu calistirildi."
+    wget --no-check-certificate $PERSONSLINK -O ~/$SETUPPATH/source.html
+    cat ~/$SETUPPATH/source.html | grep -o "/personal.*><img" | sed 's/"><img//' | sed 's/^/https\:\/\/www\.ce\.yildiz\.edu\.tr/' > ~/$SETUPPATH/personalslinks.txt
+}
+
 # Main kisim.
 function main() {
     echo "[+] main() fonksiyonu calistirildi."
-    personalname=${LINK##*/}
-    mkdir -p ~/$SETUPPATH/$personalname
-    recursive_link_follow $LINK/file ~/$SETUPPATH/$personalname
+    mkdir ~/$SETUPPATH
+    personalslinks
+    #personalname=${LINK##*/}
+    #mkdir -p ~/$SETUPPATH/$personalname
+    #recursive_link_follow $LINK/file ~/$SETUPPATH/$personalname
     #delete_tmp_file
 }
 
