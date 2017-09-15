@@ -6,6 +6,7 @@ EXTENSION=""
 LINK="https://www.ce.yildiz.edu.tr/personal/furkan"
 PERSONSLINK="https://www.ce.yildiz.edu.tr/subsites"
 SETUPPATH="ceytu"
+NON_PERSONS=("fkord" "filiz" "kazim" "ekoord")
 
 ### Fonksiyonlar
 # String icinden nokta uzantili uzantiyi cikariyoruz.
