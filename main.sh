@@ -3,7 +3,9 @@
 ### Global Degiskenler
 NON_PERSONS=("fkord" "filiz" "kazim" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "sunat" "burak"  "BTYLkoord" "tkoord")
 ICONS=("fileicon" "foldericon" "passwordfileicon" "passwordfoldericon")
-MUST_BE_DOWNLOAD=("rar" "pdf" "txt" "c" "zip" "gz" "doc" "docx")
+MUST_BE_DOWNLOAD=("rar" "zip" "gz" # Arsivlenmis ve Sıkıştırılmış dosyalar.
+                  "pdf" "doc" "docx" "ppt" "png" "jpg" "jpe" # Dokumanlar ve resimler.
+                  "java" "cpp" "c" "asm" "txt") # Kodlar.
 PERSONSLINK="https://www.ce.yildiz.edu.tr/subsites"
 LINK="https://www.ce.yildiz.edu.tr/personal/"
 SETUPPATH="all-ytuce-files"
