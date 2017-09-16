@@ -84,7 +84,7 @@ function recursive_link_follow() {
         is_link_a_file $href
         if [ "$?" = "34" ]; then # Demekki indirilebilir dosya.
             echo "Tmm indir. Panpa! :" $href
-            #download_file $href $path
+            download_file $href $path
         else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
             filename=${href##*/}
             mkdir $path/$filename
