@@ -2,7 +2,7 @@
 
 ### Global Degiskenler
 ICONS=("fileicon" "foldericon" "passwordfileicon" "passwordfoldericon")
-MUST_BE_DOWNLOAD=("rar" "pdf" "txt" "c" "zip" "gz")
+MUST_BE_DOWNLOAD=("rar" "pdf" "txt" "c" "zip" "gz" "doc" "docx")
 EXTENSION=""
 LINK="https://www.ce.yildiz.edu.tr/personal/"
 PERSONSLINK="https://www.ce.yildiz.edu.tr/subsites"
