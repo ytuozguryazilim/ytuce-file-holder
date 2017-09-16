@@ -43,7 +43,9 @@ function download_source_code() {
 function download_file() {
     echo "[+] download_file() fonksiyonu calistirildi."
     local link=$1
-    wget --no-check-certificate $link
+    local path=$2
+    local filename=${link##*/}
+    wget --no-check-certificate $link -O $path/$filename
 }
 
 function parse_link() {
@@ -64,7 +66,7 @@ function parse_link() {
 # Gecici dosyalari sil. #### Update gerekli...
 function delete_tmp_file() {
     echo "[+] delete_tmp_file() fonksiyonu calistirildi."
-    rm source.html links.txt 2> /dev/null
+    find ~/$SETUPPATH \( -name "source.html" -o -name "links.txt" -o -name "passwordlinks.txt" \) -type f -delete 2> /dev/null
 }
 
 function recursive_link_follow() {
@@ -82,7 +84,7 @@ function recursive_link_follow() {
         is_link_a_file $href
         if [ "$?" = "34" ]; then # Demekki indirilebilir dosya.
             echo "Tmm indir. Panpa! :" $href
-            #download_file $href
+            #download_file $href $path
         else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
             filename=${href##*/}
             mkdir $path/$filename
@@ -94,8 +96,8 @@ function recursive_link_follow() {
 function personalslinks() {
     # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
     echo "[+] personalslinks() fonksiyonu calistirildi."
-    wget --no-check-certificate $PERSONSLINK -O ~/$SETUPPATH/source.html
-    result=$(cat ~/$SETUPPATH/source.html \
+    wget --no-check-certificate $PERSONSLINK -O ~/$SETUPPATH/personalssource.html
+    result=$(cat ~/$SETUPPATH/personalssource.html \
                  | grep -o "/personal.*><img" \
                  | sed 's/"><img//' \
                  | sed 's/\/personal\///' \
@@ -111,6 +113,7 @@ function personalslinks() {
             echo ${LINK}${personal} >> ~/$SETUPPATH/personalslinks.txt
         fi
     done
+    delete_tmp_file
 }
 
 # Main kisim.
