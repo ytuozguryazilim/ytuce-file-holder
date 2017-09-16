@@ -3,7 +3,7 @@
 ### Global Degiskenler
 MUST_BE_DOWNLOAD=("rar" "pdf" "txt" "c" "zip" "gz")
 EXTENSION=""
-LINK="https://www.ce.yildiz.edu.tr/personal/furkan"
+LINK="https://www.ce.yildiz.edu.tr/personal/"
 PERSONSLINK="https://www.ce.yildiz.edu.tr/subsites"
 SETUPPATH="ceytu"
 NON_PERSONS=("fkord" "filiz" "kazim" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "sunat" "burak"  "BTYLkoord" "tkoord")
@@ -20,15 +20,14 @@ function is_link_a_file() {
     # Linkin indirilebilir bir dosya olup olmadigini kontrol ediyoruz. Ilk linkin uzantisini ogreniyoruz.
     # Sonrasinda Indirilecek dosya olup olmadigini kontrol ediyoruz. Eger indirilecek dosya ise 34 donuyoruz, degil ise 0 donuyoruz.
     echo "[+] is_link_a_file() fonksiyonu calistirildi."
-    local flag=0
     learn_extension_in_string $1
     for ext in ${MUST_BE_DOWNLOAD[@]}
     do
         if test "$ext" = $EXTENSION; then
-            flag=34
+            return 34
         fi
     done
-    return $flag
+    return 0
 }
 function download_source_code() {
     # Sitenin kaynak kodunu indiriyoruz. "wget" kullandigimizda certificate hatasi aldigimiz icin "--no-check-certificate" parametresi ile kullaniyoruz.
@@ -43,8 +42,8 @@ function download_file() {
     local link=$1
     wget --no-check-certificate $link
 }
-# Kaynak Koddan linkleri cikariyoruz.
 function parse_link() {
+    # Kaynak Koddan linkleri cikariyoruz.
     echo "[+] parse_link() fonksiyonu calistirildi."
     local path=$1
     cat $path/source.html | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' > $path/links.txt
@@ -60,6 +59,7 @@ function recursive_link_follow() {
     echo "[+] recursive_link_follow() fonksiyonu calistirildi."
     local link=$1
     local path=$2
+    local flag=0
     echo $link $path
     download_source_code $link $path
     parse_link $path
@@ -67,7 +67,9 @@ function recursive_link_follow() {
     for href in $(cat $path/links.txt); do
         # Burda "href" in geri tusu olup olmadigini kontrol etmeliyiz.
         is_link_a_file $href
-        if [ "$?" = "34" ]; then # Demekki indirilebilir dosya.
+        flag=$?
+        echo "Flag: " $flag
+        if [ "$flag" = "34" ]; then # Demekki indirilebilir dosya.
             echo "Tmm indir. Panpa! :" $href
             #download_file $href
         else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
@@ -100,10 +102,6 @@ function main() {
     echo "[+] main() fonksiyonu calistirildi."
     mkdir ~/$SETUPPATH
     personalslinks
-    #personalname=${LINK##*/}
-    #mkdir -p ~/$SETUPPATH/$personalname
-    #recursive_link_follow $LINK/file ~/$SETUPPATH/$personalname
-    #delete_tmp_file
 }
 
 main
