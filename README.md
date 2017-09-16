@@ -12,6 +12,7 @@ Her hocanin dosyalari takip eden ve indiren shell script
 - [ ] Scripte disardan parametre girilecek sekilde duzenlenicek.(her sayfa veya her dosya indirmede arada belli saniye bekleyecek.)
 - [ ] crontab olusturulacak.
 - [ ] Her seferinde dosyalari takip etmek icin her sayfayi crawler etmemize gerek yok. 1 kere hepsini indiririz. Zaten takip eden "https://ytuce.maliayas.com/" sitesini takip ederiz.
+- [ ] Ayri bir script yazilacak, 'git status' un durumunu kontrol edicek, eger bir degisiklik varsa commit aticak.
 - [ ] Bazi hocalar haberler kismina dosyayi koyuyorlar ki her donem sonu silinsin. Ve bir daha ugrasmamak icin. Onun icin haberler kisminida ilerde takip etmeliyiz.
 - [ ] Parola konmus dizin ve dosyalari indirmeye calisiriz.
 - [ ] Shell script ve python la gelistirme olucak. Isteyen 2 sinden birine destek olucak.
