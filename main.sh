@@ -108,8 +108,7 @@ function personalslinks() {
             echo "YES, your arr contains $personal"
         else
             echo "NO, your arr does not contain $personal"
-            echo $personal \
-                | sed 's/^/https\:\/\/www\.ce\.yildiz\.edu\.tr\/personal\//' >> ~/$SETUPPATH/personalslinks.txt
+            echo ${LINK}${personal} >> ~/$SETUPPATH/personalslinks.txt
         fi
     done
 }
