@@ -102,6 +102,11 @@ function main() {
     echo "[+] main() fonksiyonu calistirildi."
     mkdir ~/$SETUPPATH
     personalslinks
+    for personallink in $(cat $SETUPPATH/personalslinks.txt); do
+        personalname=${personallink##*/}
+        mkdir ~/$SETUPPATH/$personalname
+        recursive_link_follow ~/$personallink/file ~/$SETUPPATH/$personalname
+    done
 }
 
 main
