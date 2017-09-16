@@ -45,14 +45,21 @@ function download_file() {
     local link=$1
     wget --no-check-certificate $link
 }
+
 function parse_link() {
     # Kaynak Koddan linkleri cikariyoruz.
     echo "[+] parse_link() fonksiyonu calistirildi."
     local path=$1
-    cat $path/source.html | grep "class=\"${ICONS[0]}\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/links.txt
-    cat $path/source.html | grep "class=\"${ICONS[1]}\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/links.txt
-    cat $path/source.html | grep "class=\"${ICONS[2]}\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
-    cat $path/source.html | grep "class=\"${ICONS[3]}\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
+    for i in {0..1}; do
+        cat $path/source.html \
+            | grep "class=\"${ICONS[$i]}\"" \
+            | grep -o "$LINK.*><div" \
+            | sed 's/"><div class="iconimage"><\/div><div//' >> $path/links.txt
+        cat $path/source.html \
+            | grep "class=\"${ICONS[$i+2]}\"" \
+            | grep -o "$LINK.*><div" \
+            | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
+    done
 }
 # Gecici dosyalari sil. #### Update gerekli...
 function delete_tmp_file() {
@@ -88,7 +95,12 @@ function personalslinks() {
     # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
     echo "[+] personalslinks() fonksiyonu calistirildi."
     wget --no-check-certificate $PERSONSLINK -O ~/$SETUPPATH/source.html
-    result=$(cat ~/$SETUPPATH/source.html | grep -o "/personal.*><img" | sed 's/"><img//' | sed 's/\/personal\///' | sort | uniq )
+    result=$(cat ~/$SETUPPATH/source.html \
+                 | grep -o "/personal.*><img" \
+                 | sed 's/"><img//' \
+                 | sed 's/\/personal\///' \
+                 | sort \
+                 | uniq )
     for personal in $result
     do
         if [[ " ${NON_PERSONS[*]} " == *"$personal"* ]]
@@ -96,7 +108,8 @@ function personalslinks() {
             echo "YES, your arr contains $personal"
         else
             echo "NO, your arr does not contain $personal"
-            echo $personal | sed 's/^/https\:\/\/www\.ce\.yildiz\.edu\.tr\/personal\//' >> ~/$SETUPPATH/personalslinks.txt
+            echo $personal \
+                | sed 's/^/https\:\/\/www\.ce\.yildiz\.edu\.tr\/personal\//' >> ~/$SETUPPATH/personalslinks.txt
         fi
     done
 }
