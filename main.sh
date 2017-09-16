@@ -1,13 +1,13 @@
 #!/bin/bash
 
 ### Global Degiskenler
+NON_PERSONS=("fkord" "filiz" "kazim" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "sunat" "burak"  "BTYLkoord" "tkoord")
 ICONS=("fileicon" "foldericon" "passwordfileicon" "passwordfoldericon")
 MUST_BE_DOWNLOAD=("rar" "pdf" "txt" "c" "zip" "gz" "doc" "docx")
-EXTENSION=""
-LINK="https://www.ce.yildiz.edu.tr/personal/"
 PERSONSLINK="https://www.ce.yildiz.edu.tr/subsites"
-SETUPPATH="ceytu"
-NON_PERSONS=("fkord" "filiz" "kazim" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "sunat" "burak"  "BTYLkoord" "tkoord")
+LINK="https://www.ce.yildiz.edu.tr/personal/"
+SETUPPATH="all-ytuce-files"
+EXTENSION=""
 
 ### Fonksiyonlar
 function learn_extension_in_string() {
@@ -37,7 +37,7 @@ function download_source_code() {
     local path=$2
     wget --no-check-certificate $link -O $path/source.html
 }
-# Pdf, rar dosyasini indir.
+# Pdf, rar dosyasini indir. #### Update gerekli...
 function download_file() {
     echo "[+] download_file() fonksiyonu calistirildi."
     local link=$1
@@ -47,19 +47,19 @@ function parse_link() {
     # Kaynak Koddan linkleri cikariyoruz.
     echo "[+] parse_link() fonksiyonu calistirildi."
     local path=$1
-    cat $path/source.html | grep "class=\"fileicon\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/links.txt
-    cat $path/source.html | grep "class=\"foldericon\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/links.txt
-    cat $path/source.html | grep "class=\"passwordfileicon\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
-    cat $path/source.html | grep "class=\"passwordfoldericon\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
+    cat $path/source.html | grep "class=\"${ICONS[0]}\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/links.txt
+    cat $path/source.html | grep "class=\"${ICONS[1]}\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/links.txt
+    cat $path/source.html | grep "class=\"${ICONS[2]}\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
+    cat $path/source.html | grep "class=\"${ICONS[3]}\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
 }
-# Gecici dosyalari sil.
+# Gecici dosyalari sil. #### Update gerekli...
 function delete_tmp_file() {
     echo "[+] delete_tmp_file() fonksiyonu calistirildi."
     rm source.html links.txt 2> /dev/null
 }
 
-# Recursive sekilde linklerin kaynak kodlarindaki linkleri takip edicek.
 function recursive_link_follow() {
+    # Recursive sekilde linklerin kaynak kodlarindaki linkleri takip edicek.
     echo "[+] recursive_link_follow() fonksiyonu calistirildi."
     local link=$1
     local path=$2
@@ -71,9 +71,7 @@ function recursive_link_follow() {
     for href in $(cat $path/links.txt); do
         # Burda "href" in geri tusu olup olmadigini kontrol etmeliyiz.
         is_link_a_file $href
-        flag=$?
-        echo "Flag: " $flag
-        if [ "$flag" = "34" ]; then # Demekki indirilebilir dosya.
+        if [ "$?" = "34" ]; then # Demekki indirilebilir dosya.
             echo "Tmm indir. Panpa! :" $href
             #download_file $href
         else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
@@ -84,8 +82,8 @@ function recursive_link_follow() {
     done
 }
 
-# Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
 function personalslinks() {
+    # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
     echo "[+] personalslinks() fonksiyonu calistirildi."
     wget --no-check-certificate $PERSONSLINK -O ~/$SETUPPATH/source.html
     result=$(cat ~/$SETUPPATH/source.html | grep -o "/personal.*><img" | sed 's/"><img//' | sed 's/\/personal\///' | sort | uniq )
