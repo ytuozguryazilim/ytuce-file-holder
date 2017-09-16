@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ### Global Degiskenler
+ICONS=("fileicon" "foldericon" "passwordfileicon" "passwordfoldericon")
 MUST_BE_DOWNLOAD=("rar" "pdf" "txt" "c" "zip" "gz")
 EXTENSION=""
 LINK="https://www.ce.yildiz.edu.tr/personal/"
@@ -46,7 +47,10 @@ function parse_link() {
     # Kaynak Koddan linkleri cikariyoruz.
     echo "[+] parse_link() fonksiyonu calistirildi."
     local path=$1
-    cat $path/source.html | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' > $path/links.txt
+    cat $path/source.html | grep "class=\"fileicon\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/links.txt
+    cat $path/source.html | grep "class=\"foldericon\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/links.txt
+    cat $path/source.html | grep "class=\"passwordfileicon\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
+    cat $path/source.html | grep "class=\"passwordfoldericon\"" | grep -o "$LINK.*><div" | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
 }
 # Gecici dosyalari sil.
 function delete_tmp_file() {
