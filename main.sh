@@ -9,14 +9,29 @@ SETUPPATH="ceytu"
 NON_PERSONS=("fkord" "filiz" "kazim" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "sunat" "burak"  "BTYLkoord" "tkoord")
 
 ### Fonksiyonlar
-# String icinden nokta uzantili uzantiyi cikariyoruz.
 function learn_extension_in_string() {
+    # String icinden nokta uzantili uzantiyi cikariyoruz. Misal soyle bir linkimiz var: "https://www.ce.yildiz.edu.tr/personal/furkan/Hibernate.rar",
+    # bu linkin icinden en sagdaki noktanin sagindaki string'i "EXTENSION" degiskenine yaziyoruz. Yani "EXTENSION" degiskenine "rar" yaziyoruz.
     echo "[+] learn_extension_in_string() fonksiyonu calistirildi."
     local link=$1
     EXTENSION=${link##*.}
 }
-# Sitenin kaynak kodunu indiriyoruz. Certificate hatasi aldigimiz icin bu parametreyi kullaniyoruz.
+function is_link_a_file() {
+    # Linkin indirilebilir bir dosya olup olmadigini kontrol ediyoruz. Ilk linkin uzantisini ogreniyoruz.
+    # Sonrasinda Indirilecek dosya olup olmadigini kontrol ediyoruz. Eger indirilecek dosya ise 34 donuyoruz, degil ise 0 donuyoruz.
+    echo "[+] is_link_a_file() fonksiyonu calistirildi."
+    local flag=0
+    learn_extension_in_string $1
+    for ext in ${MUST_BE_DOWNLOAD[@]}
+    do
+        if test "$ext" = $EXTENSION; then
+            flag=34
+        fi
+    done
+    return $flag
+}
 function download_source_code() {
+    # Sitenin kaynak kodunu indiriyoruz. "wget" kullandigimizda certificate hatasi aldigimiz icin "--no-check-certificate" parametresi ile kullaniyoruz.
     echo "[+] download_source_code() fonksiyonu calistirildi."
     local link=$1
     local path=$2
@@ -39,19 +54,6 @@ function delete_tmp_file() {
     echo "[+] delete_tmp_file() fonksiyonu calistirildi."
     rm source.html links.txt 2> /dev/null
 }
-# Linkin indirilebilir bir dosya oldugunu kontrol ediyoruz.
-function is_link_a_file() {
-    echo "[+] is_link_a_file() fonksiyonu calistirildi."
-    local flag=0
-    learn_extension_in_string $1
-    for ext in ${MUST_BE_DOWNLOAD[@]}
-    do
-        if test "$ext" = $EXTENSION; then
-            flag=1
-        fi
-    done
-    return $flag
-}
 
 # Recursive sekilde linklerin kaynak kodlarindaki linkleri takip edicek.
 function recursive_link_follow() {
@@ -65,7 +67,7 @@ function recursive_link_follow() {
     for href in $(cat $path/links.txt); do
         # Burda "href" in geri tusu olup olmadigini kontrol etmeliyiz.
         is_link_a_file $href
-        if [ "$?" = "1" ]; then # Demekki indirilebilir dosya.
+        if [ "$?" = "34" ]; then # Demekki indirilebilir dosya.
             echo "Tmm indir. Panpa! :" $href
             #download_file $href
         else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
