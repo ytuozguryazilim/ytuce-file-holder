@@ -42,14 +42,27 @@ function get_file_extension() {
     local link=$1
     EXTENSION=${link##*.}
 }
+function test_is_link_a_file() {
+    local testinputs=("https://www.ce.yildiz.edu.tr/personal/furkan/Hibernate.rar"
+                      "https://www.ce.yildiz.edu.tr/personal/furkan/Bbg2")
+    for testinput in "${testinputs[@]}" ;do
+        echo "$testinput linkinin sonucu: "
+        is_link_a_file $testinput
+        if [[ "$?" = "34" ]]; then
+            echo "True"
+        else
+            echo "False"
+        fi
+    done
+}
 function is_link_a_file() {
     # Linkin indirilebilir bir dosya olup olmadigini kontrol ediyoruz.
     # Ilk linkin uzantisini ogreniyoruz. Sonrasinda Indirilecek dosya olup olmadigini kontrol ediyoruz.
     # Eger indirilecek dosya ise 34 donuyoruz, degil ise 0 donuyoruz.
-    # https://superuser.com/questions/195598/test-if-element-is-in-array-in-bash
+    # https://stackoverflow.com/questions/14366390/check-if-an-element-is-present-in-a-bash-array
     echo "[+] is_link_a_file() fonksiyonu calistirildi."
     get_file_extension $1
-    if [[ ${DOWNLOADABLE_FILE_EXTENSIONS[$EXTENSION]} ]]; then return 34; fi
+    if [[ " ${DOWNLOADABLE_FILE_EXTENSIONS[@]} " = *" $EXTENSION "* ]]; then return 34; fi
     return 0
 }
 function parse_link() {
@@ -166,6 +179,9 @@ function main() {
             ;;
         -t | --teacher )
             teacher $teachername
+            ;;
+        --test )
+            test_is_link_a_file
             ;;
         * )
             echo "Error: unknown parameter \"$1\""
