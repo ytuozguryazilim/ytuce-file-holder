@@ -125,6 +125,7 @@ function teacher() {
     echo "[+] teacher() fonksiyonu calistirildi."
     local teachername=$1
     local teacherlink=${LINK}${teachername}
+    [[ grep "^${teachername}$" ~/$SETUPPATH/teachernames.txt ]] || return 1 # Argumanin hoca olup olmadigini kontrol ediliyor.
     echo $teachername $teacherlink
     mkdir ~/$SETUPPATH/$teachername
     recursive_link_follow $teacherlink/file ~/$SETUPPATH/$teachername
@@ -157,6 +158,9 @@ function init() {
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
         echo "########### Hocanin Ismi: " $teachername
         teacher $teachername
+        if [[ "$?" = "1" ]]; then
+            echo "Boyle bir hoca yok!"
+        fi
     done
 }
 function usage() {
@@ -179,6 +183,9 @@ function main() {
             ;;
         -t | --teacher )
             teacher $teachername
+            if [[ "$?" = "1" ]]; then
+                echo "Boyle bir hoca yok!"
+            fi
             ;;
         --test )
             test_is_link_a_file
