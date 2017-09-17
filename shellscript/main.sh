@@ -1,7 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#=======================================#
+# Filename: ytuce-file-holder           #
+# Description: track files in ytuce     #
+# Maintainer: undefined                 #
+# License: GPL3.0                       #
+#=======================================#
 
-### Global Degiskenler
-NON_PERSONS=("fkord" "filiz" "kazim" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "sunat" "burak"  "BTYLkoord" "tkoord")
+### Global Variables ###
+NON_PERSONS=("fkord" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "BTYLkoord" "tkoord"
+             "filiz" "kazim" "sunat" "burak" )
 ICONS=("fileicon" "foldericon" # Parola konulmamis dosya ve dizin.
        "passwordfileicon" "passwordfoldericon") # Parolasi olan dosya ve dizin.
 DOWNLOADABLE_FILE_EXTENSIONS=("rar" "zip" "gz" # Arsivlenmis ve Sıkıştırılmış dosyalar.
@@ -40,7 +47,6 @@ function download_source_code() {
     local path=$2
     wget --no-check-certificate $link -O $path/source.html
 }
-
 function download_file() {
     # Dosya indiriliyor.
     echo "[+] download_file() fonksiyonu calistirildi."
@@ -49,7 +55,6 @@ function download_file() {
     local filename=${link##*/}
     wget --no-check-certificate $link -O $path/$filename
 }
-
 function parse_link() {
   # Kaynak koddan class ismi uyusanlar hedef dosyasina yaziliyor.
   echo "[+] parse_link() fonksiyonu calistirildi."
@@ -62,7 +67,6 @@ function parse_link() {
       | sed 's/"><div class="iconimage"><\/div><div//' \
             >> $targetfile
 }
-
 function parse_all_links() {
     # Kaynak Koddan linkleri cikariyoruz.
     # https://stackoverflow.com/questions/229551/string-contains-in-bash
@@ -76,13 +80,11 @@ function parse_all_links() {
         fi
     done
 }
-
 function delete_tmp_file() {
     # Gecici dosyalari sil...
     echo "[+] delete_tmp_file() fonksiyonu calistirildi."
     find ~/$SETUPPATH \( -name "source.html" -o -name "links.txt" -o -name "passwordlinks.txt" \) -type f -delete 2> /dev/null
 }
-
 function recursive_link_follow() {
     # Recursive sekilde linklerin kaynak kodlarindaki linkleri takip edicek.
     echo "[+] recursive_link_follow() fonksiyonu calistirildi."
@@ -104,7 +106,6 @@ function recursive_link_follow() {
         fi
     done
 }
-
 function personalslinks() {
     # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
     echo "[+] personalslinks() fonksiyonu calistirildi."
@@ -126,7 +127,6 @@ function personalslinks() {
     done
     delete_tmp_file
 }
-
 function main() {
     echo "[+] main() fonksiyonu calistirildi."
     mkdir ~/$SETUPPATH
@@ -140,3 +140,4 @@ function main() {
 }
 
 main
+exit 0
