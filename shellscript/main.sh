@@ -127,6 +127,30 @@ function personalslinks() {
     done
     delete_tmp_file
 }
+function person() {
+    echo "[+] person() fonksiyonu calistirildi."
+    local personalname=$1
+    local personallink=$2
+    mkdir ~/$SETUPPATH/$personalname
+    recursive_link_follow $personallink/file ~/$SETUPPATH/$personalname
+}
+function init() {
+    echo "[+] init() fonksiyonu calistirildi."
+    mkdir ~/$SETUPPATH
+    personalslinks
+    for personallink in $(cat ~/$SETUPPATH/personalslinks.txt); do
+        echo "##########: " $personallink
+        personalname=${personallink##*/}
+        person $personalname $personallink
+    done
+}
+function usage() {
+    echo "./main.sh "
+    echo -e "\t-h --help                  : scriptin kilavuzu."
+    echo -e "\t-i --init                  : butun hocalarin dosyalarini sifirdan indir."
+    echo -e "\t-p --person [KisininIsmi]  : belli bir hocanin dosyalari indir."
+    echo ""
+}
 function main() {
     case "$1" in
         -h | --help )
