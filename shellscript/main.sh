@@ -20,6 +20,19 @@ LINK="https://www.ce.yildiz.edu.tr/personal/"
 SETUPPATH="all-ytuce-files"
 EXTENSION=""
 
+function delete_tmp_file() {
+    # Gecici dosyalari sil...
+    echo "[+] delete_tmp_file() fonksiyonu calistirildi."
+    find ~/$SETUPPATH \( -name "source.html" -o -name "links.txt" -o -name "passwordlinks.txt" \) -type f -delete 2> /dev/null
+}
+function download_file() {
+    # Dosya indiriliyor.
+    echo "[+] download_file() fonksiyonu calistirildi."
+    local link=$1
+    local path=$2
+    local filename=${link##*/}
+    wget --no-check-certificate $link -O $path/$filename
+}
 function get_file_extension() {
     # String icinden nokta uzantili uzantiyi cikariyoruz.
     # Misal soyle bir linkimiz var: "https://www.ce.yildiz.edu.tr/personal/furkan/Hibernate.rar",
@@ -39,34 +52,17 @@ function is_link_a_file() {
     if [[ ${DOWNLOADABLE_FILE_EXTENSIONS[$EXTENSION]} ]]; then return 34; fi
     return 0
 }
-function download_source_code() {
-    # Sitenin kaynak kodunu indiriyoruz.
-    # "wget" kullandigimizda certificate hatasi aldigimiz icin "--no-check-certificate" parametresi ile kullaniyoruz.
-    # https://serverfault.com/questions/409020/how-do-i-fix-certificate-errors-when-running-wget-on-an-https-url-in-cygwin-wind
-    echo "[+] download_source_code() fonksiyonu calistirildi."
-    local link=$1
-    local path=$2
-    wget --no-check-certificate $link -O $path/source.html
-}
-function download_file() {
-    # Dosya indiriliyor.
-    echo "[+] download_file() fonksiyonu calistirildi."
-    local link=$1
-    local path=$2
-    local filename=${link##*/}
-    wget --no-check-certificate $link -O $path/$filename
-}
 function parse_link() {
-  # Kaynak koddan class ismi uyusanlar hedef dosyasina yaziliyor.
-  echo "[+] parse_link() fonksiyonu calistirildi."
-	local $sourcefile=$1
-	local $classname=$2
-	local $targetfile=$3
-	cat $sourcefile \
-      | grep "class=\"$classname\"" \
-      | grep -o "$LINK.*><div" \
-      | sed 's/"><div class="iconimage"><\/div><div//' \
-            >> $targetfile
+    # Kaynak koddan class ismi uyusanlar hedef dosyasina yaziliyor.
+    echo "[+] parse_link() fonksiyonu calistirildi."
+	  local $sourcefile=$1
+	  local $classname=$2
+	  local $targetfile=$3
+	  cat $sourcefile \
+        | grep "class=\"$classname\"" \
+        | grep -o "$LINK.*><div" \
+        | sed 's/"><div class="iconimage"><\/div><div//' \
+              >> $targetfile
 }
 function parse_all_links() {
     # Kaynak Koddan linkleri cikariyoruz.
@@ -81,10 +77,14 @@ function parse_all_links() {
         fi
     done
 }
-function delete_tmp_file() {
-    # Gecici dosyalari sil...
-    echo "[+] delete_tmp_file() fonksiyonu calistirildi."
-    find ~/$SETUPPATH \( -name "source.html" -o -name "links.txt" -o -name "passwordlinks.txt" \) -type f -delete 2> /dev/null
+function download_source_code() {
+    # Sitenin kaynak kodunu indiriyoruz.
+    # "wget" kullandigimizda certificate hatasi aldigimiz icin "--no-check-certificate" parametresi ile kullaniyoruz.
+    # https://serverfault.com/questions/409020/how-do-i-fix-certificate-errors-when-running-wget-on-an-https-url-in-cygwin-wind
+    echo "[+] download_source_code() fonksiyonu calistirildi."
+    local link=$1
+    local path=$2
+    wget --no-check-certificate $link -O $path/source.html
 }
 function recursive_link_follow() {
     # Recursive sekilde linklerin kaynak kodlarindaki linkleri takip edicek.
@@ -107,6 +107,15 @@ function recursive_link_follow() {
         fi
     done
 }
+function teacher() {
+    # Sadece arguman olarak alinan hoca ismi ile hocanin dosyalari indiriliyor.
+    echo "[+] teacher() fonksiyonu calistirildi."
+    local teachername=$1
+    local teacherlink=${LINK}${teachername}
+    echo $teachername $teacherlink
+    mkdir ~/$SETUPPATH/$teachername
+    recursive_link_follow $teacherlink/file ~/$SETUPPATH/$teachername
+}
 function all_teacher_names() {
     # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
     # Burdaki tum personal isimleri aliniyor. Sonra hoca olanlar "teachernames.txt" dosyasina ekleniyor.
@@ -120,22 +129,11 @@ function all_teacher_names() {
                  | uniq )
     for personalname in $result
     do
-        if [[ ${NON_PERSONS[$personalname]} ]]; then
-            echo "Boyle bir hoca yok!"
-        else
-            echo "Aynen boyle bir hoca var!"
+        if [[ ! " ${NON_PERSONS[*]} " == *" $personalname "* ]]; then
+            # echo "Aynen boyle bir hoca var!: $personalname"
             echo ${personalname} >> ~/$SETUPPATH/teachernames.txt
         fi
     done
-    delete_tmp_file
-}
-function teacher() {
-    # Sadece arguman olarak alinan hoca ismi ile hocanin dosyalari indiriliyor.
-    echo "[+] teacher() fonksiyonu calistirildi."
-    local teachername=$1
-    local teacherlink=${LINK}${teachername}
-    mkdir ~/$SETUPPATH/$teachername
-    recursive_link_follow $teacherlink/file ~/$SETUPPATH/$teachername
 }
 function init() {
     # Ilk olarak tum hoca isimleri ogreniliyor("teachernames.txt").
@@ -152,7 +150,7 @@ function usage() {
     echo "./main.sh "
     echo -e "\t-h --help                  : scriptin kilavuzu."
     echo -e "\t-i --init                  : butun hocalarin dosyalarini sifirdan indir."
-    echo -e "\t-t --teacher [HocaninIsmi]  : belli bir hocanin dosyalari indir."
+    echo -e "\t-t --teacher [HocaninIsmi] : belli bir hocanin dosyalari indir."
     echo ""
 }
 function main() {
