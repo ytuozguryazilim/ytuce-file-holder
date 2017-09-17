@@ -2,7 +2,8 @@
 
 ### Global Degiskenler
 NON_PERSONS=("fkord" "filiz" "kazim" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "sunat" "burak"  "BTYLkoord" "tkoord")
-ICONS=("fileicon" "foldericon" "passwordfileicon" "passwordfoldericon")
+ICONS=("fileicon" "foldericon" # Parola konulmamis dosya ve dizin.
+       "passwordfileicon" "passwordfoldericon") # Parolasi olan dosya ve dizin.
 DOWNLOADABLE_FILE_EXTENSIONS=("rar" "zip" "gz" # Arsivlenmis ve Sıkıştırılmış dosyalar.
                               "pdf" "doc" "docx" "ppt" "png" "jpg" "jpe" # Dokumanlar ve resimler.
                               "java" "cpp" "c" "asm" "txt") # Kodlar.
@@ -41,7 +42,7 @@ function download_source_code() {
 }
 
 function download_file() {
-    # Dosyalar indiriliyor.
+    # Dosya indiriliyor.
     echo "[+] download_file() fonksiyonu calistirildi."
     local link=$1
     local path=$2
@@ -64,11 +65,15 @@ function parse_link() {
 
 function parse_all_links() {
     # Kaynak Koddan linkleri cikariyoruz.
+    # https://stackoverflow.com/questions/229551/string-contains-in-bash
     echo "[+] parse_all_links() fonksiyonu calistirildi."
     local path=$1
-    for i in {0..1}; do
-        parse_link $path/source.html ${ICONS[$i]} $path/links.txt
-        parse_link $path/source.html $classname $path/passwordlinks.txt
+    for classname in "${ICONS[@]}"; do
+        if [[ $classname == *"password"* ]]; then # "$classname" degiskeninin icinde "password" diye bir string var mi?
+            parse_link $path/source.html $classname $path/passwordlinks.txt
+        else
+            parse_link $path/source.html $classname $path/links.txt
+        fi
     done
 }
 
@@ -83,13 +88,11 @@ function recursive_link_follow() {
     echo "[+] recursive_link_follow() fonksiyonu calistirildi."
     local link=$1
     local path=$2
-    local flag=0
     echo $link $path
     download_source_code $link $path
     parse_all_links $path
     cat $path/links.txt
     for href in $(cat $path/links.txt); do
-        # Burda "href" in geri tusu olup olmadigini kontrol etmeliyiz.
         is_link_a_file $href
         if [ "$?" = "34" ]; then # Demekki indirilebilir dosya.
             echo "Tmm indir. Panpa! :" $href
@@ -114,11 +117,10 @@ function personalslinks() {
                  | uniq )
     for personal in $result
     do
-        if [[ " ${NON_PERSONS[*]} " == *"$personal"* ]]
-        then
-            echo "YES, your arr contains $personal"
+        if [[ ${NON_PERSONS[$personal]} ]]; then
+            echo "Boyle bir hoca yok!"
         else
-            echo "NO, your arr does not contain $personal"
+            echo "Aynen boyle bir hoca var!"
             echo ${LINK}${personal} >> ~/$SETUPPATH/personalslinks.txt
         fi
     done
