@@ -50,18 +50,25 @@ function download_file() {
 }
 
 function parse_link() {
+  # Kaynak koddan class ismi uyusanlar hedef dosyasina yaziliyor.
+  echo "[+] parse_link() fonksiyonu calistirildi."
+	local $sourcefile=$1
+	local $classname=$2
+	local $targetfile=$3
+	cat $sourcefile \
+      | grep "class=\"$classname\"" \
+      | grep -o "$LINK.*><div" \
+      | sed 's/"><div class="iconimage"><\/div><div//' \
+            >> $targetfile
+}
+
+function parse_all_links() {
     # Kaynak Koddan linkleri cikariyoruz.
-    echo "[+] parse_link() fonksiyonu calistirildi."
+    echo "[+] parse_all_links() fonksiyonu calistirildi."
     local path=$1
     for i in {0..1}; do
-        cat $path/source.html \
-            | grep "class=\"${ICONS[$i]}\"" \
-            | grep -o "$LINK.*><div" \
-            | sed 's/"><div class="iconimage"><\/div><div//' >> $path/links.txt
-        cat $path/source.html \
-            | grep "class=\"${ICONS[$i+2]}\"" \
-            | grep -o "$LINK.*><div" \
-            | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
+        parse_link $path/source.html ${ICONS[$i]} $path/links.txt
+        parse_link $path/source.html $classname $path/passwordlinks.txt
     done
 }
 
@@ -79,7 +86,7 @@ function recursive_link_follow() {
     local flag=0
     echo $link $path
     download_source_code $link $path
-    parse_link $path
+    parse_all_links $path
     cat $path/links.txt
     for href in $(cat $path/links.txt); do
         # Burda "href" in geri tusu olup olmadigini kontrol etmeliyiz.
