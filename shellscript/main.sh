@@ -12,27 +12,28 @@ SETUPPATH="all-ytuce-files"
 EXTENSION=""
 
 function get_file_extension() {
-    # String icinden nokta uzantili uzantiyi cikariyoruz. Misal soyle bir linkimiz var: "https://www.ce.yildiz.edu.tr/personal/furkan/Hibernate.rar",
-    # bu linkin icinden en sagdaki noktanin sagindaki string'i "EXTENSION" degiskenine yaziyoruz. Yani "EXTENSION" degiskenine "rar" yaziyoruz.
+    # String icinden nokta uzantili uzantiyi cikariyoruz.
+    # Misal soyle bir linkimiz var: "https://www.ce.yildiz.edu.tr/personal/furkan/Hibernate.rar",
+    # bu linkin icinden en sagdaki noktanin sagindaki string'i "EXTENSION" degiskenine yaziyoruz.
+    # Yani "EXTENSION" degiskenine "rar" yaziyoruz.
     echo "[+] learn_extension_in_string() fonksiyonu calistirildi."
     local link=$1
     EXTENSION=${link##*.}
 }
 function is_link_a_file() {
-    # Linkin indirilebilir bir dosya olup olmadigini kontrol ediyoruz. Ilk linkin uzantisini ogreniyoruz.
-    # Sonrasinda Indirilecek dosya olup olmadigini kontrol ediyoruz. Eger indirilecek dosya ise 34 donuyoruz, degil ise 0 donuyoruz.
+    # Linkin indirilebilir bir dosya olup olmadigini kontrol ediyoruz.
+    # Ilk linkin uzantisini ogreniyoruz. Sonrasinda Indirilecek dosya olup olmadigini kontrol ediyoruz.
+    # Eger indirilecek dosya ise 34 donuyoruz, degil ise 0 donuyoruz.
+    # https://superuser.com/questions/195598/test-if-element-is-in-array-in-bash
     echo "[+] is_link_a_file() fonksiyonu calistirildi."
     get_file_extension $1
-    for ext in ${DOWNLOADABLE_FILE_EXTENSIONS[@]}
-    do
-        if test "$ext" = $EXTENSION; then
-            return 34
-        fi
-    done
+    if [[ ${DOWNLOADABLE_FILE_EXTENSIONS[$EXTENSION]} ]]; then return 34; fi
     return 0
 }
 function download_source_code() {
-    # Sitenin kaynak kodunu indiriyoruz. "wget" kullandigimizda certificate hatasi aldigimiz icin "--no-check-certificate" parametresi ile kullaniyoruz.
+    # Sitenin kaynak kodunu indiriyoruz.
+    # "wget" kullandigimizda certificate hatasi aldigimiz icin "--no-check-certificate" parametresi ile kullaniyoruz.
+    # https://serverfault.com/questions/409020/how-do-i-fix-certificate-errors-when-running-wget-on-an-https-url-in-cygwin-wind
     echo "[+] download_source_code() fonksiyonu calistirildi."
     local link=$1
     local path=$2
