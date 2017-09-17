@@ -6,11 +6,15 @@
 - [X] "recursive_link_follow()" fonksiyonun icindeki "href" in geri tusu olup olmadigini kontrol etmeliyiz.
 - [X] Karsilastirma yapilmali. Dosya takip sisteminde yok ise indirilmeli. Dosya var ise ayni isimdeki dosyayla karsilastirilmali(Suanlik dosya boyutuna gore). Farkli ise indirilerek ve dosya isminin sonuna tarih atilmali.(GIT kullanicaz panpa!)
 - [X] Log dosyasina ciktilari yaz.
-- [ ] Scripte disardan parametre girilecek sekilde duzenlenicek.(her sayfa veya her dosya indirmede arada belli saniye bekleyecek.)
 - [ ] crontab olusturulacak.
-- [ ] Her seferinde dosyalari takip etmek icin her sayfayi crawler etmemize gerek yok. 1 kere hepsini indiririz. Zaten takip eden "https://ytuce.maliayas.com/" sitesini takip ederiz.
-- [ ] Ayri bir script yazilacak, 'git status' un durumunu kontrol edicek, eger bir degisiklik varsa commit aticak.
+- [ ] Her seferinde dosyalari takip etmek icin her sayfayi crawler etmemize gerek yok. 1 kere hepsini indiririz. Zaten takip eden "https://ytuce.maliayas.com/" sitesini takip ederiz. Belki site sadece hocalarin haberleri takip ediyordur.?
 - [ ] Bazi hocalar haberler kismina dosyayi koyuyorlar ki her donem sonu silinsin. Ve bir daha ugrasmamak icin. Onun icin haberler kisminida ilerde takip etmeliyiz.
+- [X] Ayri bir script yazilacak, 'git status' un durumunu kontrol edicek, eger bir degisiklik varsa commit aticak.(https://github.com/GnuYtuce/all-ytuce-files/blob/master/automatic-checking-changes.sh)
 - [ ] Parola konmus dizin ve dosyalari indirmeye calisiriz.
 - [X] Shell script ve python la gelistirme olucak. Isteyen 2 sinden birine destek olucak.
 - [X] Ayri bir repo acilacak. Ve scriptler calistirilip dosyalar githuba yuklenicek. Ve repoyu github pages olarak sunariz.
+- [ ] Scripte disardan parametre girilecek sekilde duzenlenicek.(her sayfa veya her dosya indirmede arada belli saniye bekleyecek.)
+- [ ] Script 3 is yapmali: 1.olarak tum kisilerin dosyalari indirmek, 2.ci olarak sadece belli bir kisiyinin dosyalari indirmek, 3.ci olarak dosyalari update etmek(yeni links.txt degisiklige gore.).
+- [ ] Diger repoya .gitignore eklenmeli: personalslinks.txt, source.html, links.txt, passwordlinks.txt dosyalari takip etmemeli.
+- [ ] Belki hoca gecen seneki dosyanin aynisini bu sene farkli bir klasor attinda yuklerse onu farketmeliyiz. Ve indirmemeliyiz.
+- [ ] Scriptin devamli calisabilecegi veya gun icinde belli bir zamanda calismasini saglayacak uygun ortam sagla. En az 5 gb yer olmasi lazim, ilerde dosya boyutu buyuyebilir.
