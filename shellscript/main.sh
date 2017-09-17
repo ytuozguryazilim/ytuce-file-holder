@@ -128,16 +128,24 @@ function personalslinks() {
     delete_tmp_file
 }
 function main() {
-    echo "[+] main() fonksiyonu calistirildi."
-    mkdir ~/$SETUPPATH
-    personalslinks
-    for personallink in $(cat ~/$SETUPPATH/personalslinks.txt); do
-        echo "##########: " $personallink
-        personalname=${personallink##*/}
-        mkdir ~/$SETUPPATH/$personalname
-        recursive_link_follow $personallink/file ~/$SETUPPATH/$personalname
-    done
+    case "$1" in
+        -h | --help )
+            usage
+            exit 0
+            ;;
+        -i | --init )
+            init
+            exit 0
+            ;;
+        -p | --personal )
+            person $2 ${LINK}$2
+            ;;
+        * )
+            echo "Error: unknown parameter \"$1\""
+            usage
+            exit 1
+            ;;
+    esac
 }
 
-main
-exit 0
+main $@
