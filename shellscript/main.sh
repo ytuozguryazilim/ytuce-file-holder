@@ -3,16 +3,15 @@
 ### Global Degiskenler
 NON_PERSONS=("fkord" "filiz" "kazim" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "sunat" "burak"  "BTYLkoord" "tkoord")
 ICONS=("fileicon" "foldericon" "passwordfileicon" "passwordfoldericon")
-MUST_BE_DOWNLOAD=("rar" "zip" "gz" # Arsivlenmis ve Sıkıştırılmış dosyalar.
-                  "pdf" "doc" "docx" "ppt" "png" "jpg" "jpe" # Dokumanlar ve resimler.
-                  "java" "cpp" "c" "asm" "txt") # Kodlar.
-PERSONSLINK="https://www.ce.yildiz.edu.tr/subsites"
+DOWNLOADABLE_FILE_EXTENSIONS=("rar" "zip" "gz" # Arsivlenmis ve Sıkıştırılmış dosyalar.
+                              "pdf" "doc" "docx" "ppt" "png" "jpg" "jpe" # Dokumanlar ve resimler.
+                              "java" "cpp" "c" "asm" "txt") # Kodlar.
+PROFILES_URL="https://www.ce.yildiz.edu.tr/subsites"
 LINK="https://www.ce.yildiz.edu.tr/personal/"
 SETUPPATH="all-ytuce-files"
 EXTENSION=""
 
-### Fonksiyonlar
-function learn_extension_in_string() {
+function get_file_extension() {
     # String icinden nokta uzantili uzantiyi cikariyoruz. Misal soyle bir linkimiz var: "https://www.ce.yildiz.edu.tr/personal/furkan/Hibernate.rar",
     # bu linkin icinden en sagdaki noktanin sagindaki string'i "EXTENSION" degiskenine yaziyoruz. Yani "EXTENSION" degiskenine "rar" yaziyoruz.
     echo "[+] learn_extension_in_string() fonksiyonu calistirildi."
@@ -23,8 +22,8 @@ function is_link_a_file() {
     # Linkin indirilebilir bir dosya olup olmadigini kontrol ediyoruz. Ilk linkin uzantisini ogreniyoruz.
     # Sonrasinda Indirilecek dosya olup olmadigini kontrol ediyoruz. Eger indirilecek dosya ise 34 donuyoruz, degil ise 0 donuyoruz.
     echo "[+] is_link_a_file() fonksiyonu calistirildi."
-    learn_extension_in_string $1
-    for ext in ${MUST_BE_DOWNLOAD[@]}
+    get_file_extension $1
+    for ext in ${DOWNLOADABLE_FILE_EXTENSIONS[@]}
     do
         if test "$ext" = $EXTENSION; then
             return 34
@@ -39,8 +38,9 @@ function download_source_code() {
     local path=$2
     wget --no-check-certificate $link -O $path/source.html
 }
-# Pdf, rar dosyasini indir. #### Update gerekli...
+
 function download_file() {
+    # Dosyalar indiriliyor.
     echo "[+] download_file() fonksiyonu calistirildi."
     local link=$1
     local path=$2
@@ -63,8 +63,9 @@ function parse_link() {
             | sed 's/"><div class="iconimage"><\/div><div//' >> $path/passwordlinks.txt
     done
 }
-# Gecici dosyalari sil. #### Update gerekli...
+
 function delete_tmp_file() {
+    # Gecici dosyalari sil...
     echo "[+] delete_tmp_file() fonksiyonu calistirildi."
     find ~/$SETUPPATH \( -name "source.html" -o -name "links.txt" -o -name "passwordlinks.txt" \) -type f -delete 2> /dev/null
 }
@@ -96,7 +97,7 @@ function recursive_link_follow() {
 function personalslinks() {
     # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
     echo "[+] personalslinks() fonksiyonu calistirildi."
-    wget --no-check-certificate $PERSONSLINK -O ~/$SETUPPATH/personalssource.html
+    wget --no-check-certificate $PROFILES_URL -O ~/$SETUPPATH/personalssource.html
     result=$(cat ~/$SETUPPATH/personalssource.html \
                  | grep -o "/personal.*><img" \
                  | sed 's/"><img//' \
@@ -116,7 +117,6 @@ function personalslinks() {
     delete_tmp_file
 }
 
-# Main kisim.
 function main() {
     echo "[+] main() fonksiyonu calistirildi."
     mkdir ~/$SETUPPATH
