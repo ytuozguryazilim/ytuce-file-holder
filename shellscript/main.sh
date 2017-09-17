@@ -4,6 +4,7 @@
 # Description: track files in ytuce     #
 # Maintainer: undefined                 #
 # License: GPL3.0                       #
+# Version: 1.2.0                        #
 #=======================================#
 
 ### Global Variables ###
@@ -106,9 +107,10 @@ function recursive_link_follow() {
         fi
     done
 }
-function personalslinks() {
+function all_teacher_names() {
     # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
-    echo "[+] personalslinks() fonksiyonu calistirildi."
+    # Burdaki tum personal isimleri aliniyor. Sonra hoca olanlar "teachernames.txt" dosyasina ekleniyor.
+    echo "[+] all_teacher_names() fonksiyonu calistirildi."
     wget --no-check-certificate $PROFILES_URL -O ~/$SETUPPATH/personalssource.html
     result=$(cat ~/$SETUPPATH/personalssource.html \
                  | grep -o "/personal.*><img" \
@@ -116,53 +118,56 @@ function personalslinks() {
                  | sed 's/\/personal\///' \
                  | sort \
                  | uniq )
-    for personal in $result
+    for personalname in $result
     do
-        if [[ ${NON_PERSONS[$personal]} ]]; then
+        if [[ ${NON_PERSONS[$personalname]} ]]; then
             echo "Boyle bir hoca yok!"
         else
             echo "Aynen boyle bir hoca var!"
-            echo ${LINK}${personal} >> ~/$SETUPPATH/personalslinks.txt
+            echo ${personalname} >> ~/$SETUPPATH/teachernames.txt
         fi
     done
     delete_tmp_file
 }
-function person() {
-    echo "[+] person() fonksiyonu calistirildi."
-    local personalname=$1
-    local personallink=$2
-    mkdir ~/$SETUPPATH/$personalname
-    recursive_link_follow $personallink/file ~/$SETUPPATH/$personalname
+function teacher() {
+    # Sadece arguman olarak alinan hoca ismi ile hocanin dosyalari indiriliyor.
+    echo "[+] teacher() fonksiyonu calistirildi."
+    local teachername=$1
+    local teacherlink=${LINK}${teachername}
+    mkdir ~/$SETUPPATH/$teachername
+    recursive_link_follow $teacherlink/file ~/$SETUPPATH/$teachername
 }
 function init() {
+    # Ilk olarak tum hoca isimleri ogreniliyor("teachernames.txt").
+    # Sonrasinda tum hocalarin dosyalari indiriliyor.
     echo "[+] init() fonksiyonu calistirildi."
     mkdir ~/$SETUPPATH
-    personalslinks
-    for personallink in $(cat ~/$SETUPPATH/personalslinks.txt); do
-        echo "##########: " $personallink
-        personalname=${personallink##*/}
-        person $personalname $personallink
+    all_teacher_names
+    for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
+        echo "########### Hocanin Ismi: " $teachername
+        teacher $teachername
     done
 }
 function usage() {
     echo "./main.sh "
     echo -e "\t-h --help                  : scriptin kilavuzu."
     echo -e "\t-i --init                  : butun hocalarin dosyalarini sifirdan indir."
-    echo -e "\t-p --person [KisininIsmi]  : belli bir hocanin dosyalari indir."
+    echo -e "\t-t --teacher [HocaninIsmi]  : belli bir hocanin dosyalari indir."
     echo ""
 }
 function main() {
-    case "$1" in
+    local argument=$1
+    local teachername=$2
+    case "$argument" in
         -h | --help )
             usage
             exit 0
             ;;
         -i | --init )
             init
-            exit 0
             ;;
-        -p | --personal )
-            person $2 ${LINK}$2
+        -t | --teacher )
+            teacher $teachername
             ;;
         * )
             echo "Error: unknown parameter \"$1\""
