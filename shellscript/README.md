@@ -14,7 +14,7 @@
 - [X] Shell script ve python la gelistirme olucak. Isteyen 2 sinden birine destek olucak.
 - [X] Ayri bir repo acilacak. Ve scriptler calistirilip dosyalar githuba yuklenicek. Ve repoyu github pages olarak sunariz.
 - [ ] Scripte disardan parametre girilecek sekilde duzenlenicek.(her sayfa veya her dosya indirmede arada belli saniye bekleyecek.)
-- [ ] Script 3 is yapmali: 1.olarak tum kisilerin dosyalari indirmek, 2.ci olarak sadece belli bir kisiyinin dosyalari indirmek, 3.ci olarak dosyalari update etmek(yeni links.txt degisiklige gore.).
-- [ ] Diger repoya .gitignore eklenmeli: personalslinks.txt, source.html, links.txt, passwordlinks.txt dosyalari takip etmemeli.
+- [X] Script 3 is yapmali: 1.olarak tum kisilerin dosyalari indirmek, 2.ci olarak sadece belli bir kisiyinin dosyalari indirmek, 3.ci olarak dosyalari update etmek(yeni links.txt degisiklige gore.).
+- [X] Diger repoya .gitignore eklenmeli: personalslinks.txt, source.html, links.txt, passwordlinks.txt dosyalari takip etmemeli.
 - [ ] Belki hoca gecen seneki dosyanin aynisini bu sene farkli bir klasor attinda yuklerse onu farketmeliyiz. Ve indirmemeliyiz.
 - [ ] Scriptin devamli calisabilecegi veya gun icinde belli bir zamanda calismasini saglayacak uygun ortam sagla. En az 5 gb yer olmasi lazim, ilerde dosya boyutu buyuyebilir.
