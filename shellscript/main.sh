@@ -19,6 +19,8 @@ PROFILES_URL="https://www.ce.yildiz.edu.tr/subsites"
 LINK="https://www.ce.yildiz.edu.tr/personal/"
 SETUPPATH="all-ytuce-files"
 EXTENSION=""
+FILENAME=""
+DIRNAME=""
 
 function delete_tmp_file() {
     # Gecici dosyalari sil...
@@ -166,28 +168,41 @@ function init() {
         fi
     done
 }
-function update_teacher_files() {
-    # Bir hocanin dosyalari gunceller. Guncellerken links sayisinda degisiklige bakmali(Ama en icten baslamali).
-    echo "[+] update_teacher_files() fonksiyonu calistirildi."
+function recursive_teacher_files_follow() {
+    # Recursive sekilde hocanin dosyalarin linkleri takip edilir.
+    echo "[+] recursive_teacher_files_follow() fonksiyonu calistirildi."
     local teachername=$1
-    local teacherlink=${LINK}${teachername}
-    local teacherpath=~/$SETUPPATH/$teachername
-    [[ grep "^${teachername}$" ~/$SETUPPATH/teachernames.txt ]] || return 1 # Argumanin hoca olup olmadigini kontrol ediliyor.
-    echo $teachername $teacherlink $teacherpath
-    download_source_code $teacherlink/file $teacherpath/source.html
-    parse_all_links $teacherpath source.html newlinks.txt passwordlinks.txt
-    # recursive_update_files
-    # newlinks.txt ve links.txt karsilastirilacak.
+    local path=$2
+    local link=$3
+    download_source_code $link/file $path/source.html
+    parse_all_links $path source.html links.txt passwordlinks.txt
+    cat $path/$linksfilename
+    for href in $(cat $path/$linksfilename); do
+        is_link_a_file $href
+        FILENAME=${href##*/}
+        DIRNAME=${href##*/}
+        if [ "$?" = "34" ]; then # Demekki indirilebilir dosya.
+            echo $path/$FILENAME $href >> ~/$SETUPPATH/$teachername/updatefilelist.txt
+        else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
+            recursive_teacher_files_follow $teachername $path/$DIRNAME $href
+        fi
+    done
 }
 function update() {
     # Butun hocalarin dosyalarini gunceller.
     echo "[+] update() fonksiyonu calistirildi."
+    local teachername=""
+    local teacherlink=""
+    local teacherpath=""
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
         echo "########### Hocanin Ismi: " $teachername
-        update_teacher_files $teachername
-        if [[ "$?" = "1" ]]; then
-            echo "Boyle bir hoca yok!"
-        fi
+        teacherlink=${LINK}${teachername}
+        teacherpath=~/$SETUPPATH/$teachername
+        [[ grep "^${teachername}$" ~/$SETUPPATH/teachernames.txt ]] || return 1 # Argumanin hoca olup olmadigini kontrol ediliyor.
+        echo $teachername $teacherlink $teacherpath
+        touch ~/$teacherpath/updatefilelist.txt
+        recursive_teacher_files $teachername $teacherlink $teacherpath
+        # Burda updatefilelist.txt ve filelist.txt karsilastiracagiz.
     done
 }
 function usage() {
@@ -217,6 +232,9 @@ function main() {
             ;;
         -u | --update )
             update
+            if [[ "$?" = "1" ]]; then
+                echo "Boyle bir hoca yok!"
+            fi
             ;;
         --test )
             test_is_link_a_file
