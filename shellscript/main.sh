@@ -82,16 +82,19 @@ function parse_all_links() {
     # https://stackoverflow.com/questions/229551/string-contains-in-bash
     echo "[+] parse_all_links() fonksiyonu calistirildi."
     local path=$1
+    local sourcefilename=$2
+    local linksfilename=$3
+    local passwordlinksfilename=$4
     for classname in "${ICONS[@]}"; do
         if [[ $classname == *"password"* ]]; then # "$classname" degiskeninin icinde "password" diye bir string var mi?
-            parse_link $path/source.html $classname $path/passwordlinks.txt
+            parse_link $path/$sourcefilename $classname $path/$passwordlinksfilename
         else
-            parse_link $path/source.html $classname $path/links.txt
+            parse_link $path/$sourcefilename $classname $path/$linksfilename
         fi
     done
 }
 function download_source_code() {
-    # Sitenin kaynak kodunu indiriyoruz.
+    # Linkin kaynak kodunu indiriyoruz.
     # "wget" kullandigimizda certificate hatasi aldigimiz icin "--no-check-certificate" parametresi ile kullaniyoruz.
     # https://serverfault.com/questions/409020/how-do-i-fix-certificate-errors-when-running-wget-on-an-https-url-in-cygwin-wind
     echo "[+] download_source_code() fonksiyonu calistirildi."
@@ -106,7 +109,7 @@ function recursive_link_follow() {
     local path=$2
     echo $link $path
     download_source_code $link $path/source.html
-    parse_all_links $path
+    parse_all_links $path source.html links.txt passwordlinks.txt
     cat $path/links.txt
     for href in $(cat $path/links.txt); do
         is_link_a_file $href
@@ -134,7 +137,7 @@ function all_teacher_names() {
     # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
     # Burdaki tum personal isimleri aliniyor. Sonra hoca olanlar "teachernames.txt" dosyasina ekleniyor.
     echo "[+] all_teacher_names() fonksiyonu calistirildi."
-    download_source_code $PROFILES_URL -O ~/$SETUPPATH/personalssource.html
+    download_source_code $PROFILES_URL ~/$SETUPPATH/personalssource.html
     result=$(cat ~/$SETUPPATH/personalssource.html \
                  | grep -o "/personal.*><img" \
                  | sed 's/"><img//' \
@@ -168,10 +171,13 @@ function update_teacher_files() {
     echo "[+] update_teacher_files() fonksiyonu calistirildi."
     local teachername=$1
     local teacherlink=${LINK}${teachername}
+    local teacherpath=~/$SETUPPATH/$teachername
     [[ grep "^${teachername}$" ~/$SETUPPATH/teachernames.txt ]] || return 1 # Argumanin hoca olup olmadigini kontrol ediliyor.
-    echo $teachername $teacherlink
-    download_source_code $teacherlink/file ~/$SETUPPATH/$teachername/source.html
-    # all_parse_links
+    echo $teachername $teacherlink $teacherpath
+    download_source_code $teacherlink/file $teacherpath/source.html
+    parse_all_links $teacherpath source.html newlinks.txt passwordlinks.txt
+    # recursive_update_files
+    # newlinks.txt ve links.txt karsilastirilacak.
 }
 function update() {
     # Butun hocalarin dosyalarini gunceller.
