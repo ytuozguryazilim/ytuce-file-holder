@@ -4,7 +4,7 @@
 # Description: track files in ytuce     #
 # Maintainer: undefined                 #
 # License: GPL3.0                       #
-# Version: 1.2.0                        #
+# Version: 1.4.0                        #
 #=======================================#
 
 ### Global Variables ###
@@ -64,7 +64,7 @@ function is_link_a_file() {
 function parse_link() {
     # Kaynak koddan class ismi uyusanlar hedef dosyasina yaziliyor.
     echo "[+] parse_link() fonksiyonu calistirildi."
-	  local $sourcefile=$1
+    local $sourcefile=$1
 	  local $classname=$2
 	  local $targetfile=$3
 	  cat $sourcefile \
@@ -178,7 +178,7 @@ function init() {
 }
 
 function update() {
-    # Butun hocalarin dosyalarini gunceller.
+    # Butun hocalarin dosyalarini guncellenir.
     echo "[+] update() fonksiyonu calistirildi."
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
         echo "########### Hocanin Ismi: " $teachername
@@ -187,6 +187,8 @@ function update() {
             echo "Boyle bir hoca yok!"
         fi
         # Burda updatefilelist.txt ve filelist.txt karsilastiracagiz.
+        # Farkli olan link ve dosyalari indiricez. Ve filelist.txt dosyasina ekleyecegiz.
+        # Sonrasinda updatefilelist.txt dosyasini silicez.
     done
 }
 function usage() {
@@ -194,6 +196,8 @@ function usage() {
     echo -e "\t-h --help                  : scriptin kilavuzu."
     echo -e "\t-i --init                  : butun hocalarin dosyalarini sifirdan indir."
     echo -e "\t-t --teacher [HocaninIsmi] : belli bir hocanin dosyalari indir."
+    echo -e "\t--all-teacher-names        : butun hoca isimleri teachernames.txt dosyasina kaydeder."
+    echo -e "\t-u --uptate                : hocalarin dosyalari guncellenir."
     echo -e "\t--test                     : test fonksiyonlar calistirilir."
     echo ""
 }
