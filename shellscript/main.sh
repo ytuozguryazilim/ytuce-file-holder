@@ -31,7 +31,8 @@ function download_file() {
     echo "[+] download_file() fonksiyonu calistirildi."
     local link=$1
     local path=$2
-    wget --no-check-certificate $link -O $path
+    FILENAME=${path##*/}
+    wget --no-check-certificate $link -O $path/$FILENAME
 }
 function test_is_link_a_file() {
     local testinputs=("https://www.ce.yildiz.edu.tr/personal/furkan/Hibernate.rar"
@@ -116,7 +117,7 @@ function recursive_link_follow() {
             echo "Tmm indir. Panpa! :" $href
             if [[ "$commandname" == "init" ]]; then
                 echo $path/$FILENAME $href >> ~/$SETUPPATH/$teachername/filelist.txt
-                download_file $href $path/$FILENAME
+                download_file $href $path
             else if [[ "$commandname" == "update" ]]; then
                 echo $path/$FILENAME $href >> ~/$SETUPPATH/$teachername/updatefilelist.txt
             fi
@@ -143,21 +144,20 @@ function teacher() {
     fi
     recursive_link_follow $commandname $teachername $teacherlink/file $teacherpath
 }
-function all_teacher_names() {
+function get_all_teacher_names_then_save() {
     # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
     # Burdaki tum personal isimleri aliniyor. Sonra hoca olanlar "teachernames.txt" dosyasina ekleniyor.
-    echo "[+] all_teacher_names() fonksiyonu calistirildi."
+    echo "[+] get_all_teacher_names_then_save() fonksiyonu calistirildi."
     download_source_code $PROFILES_URL ~/$SETUPPATH/personalssource.html
-    result=$(cat ~/$SETUPPATH/personalssource.html \
+    personalnames=$(cat ~/$SETUPPATH/personalssource.html \
                  | grep -o "/personal.*><img" \
                  | sed 's/"><img//' \
                  | sed 's/\/personal\///' \
                  | sort \
                  | uniq )
-    for personalname in $result
+    for personalname in $personalnames
     do
         if [[ ! " ${NON_PERSONS[*]} " == *" $personalname "* ]]; then
-            # echo "Aynen boyle bir hoca var!: $personalname"
             echo ${personalname} >> ~/$SETUPPATH/teachernames.txt
         fi
     done
@@ -167,7 +167,7 @@ function init() {
     # Sonrasinda tum hocalarin dosyalari indiriliyor.
     echo "[+] init() fonksiyonu calistirildi."
     mkdir ~/$SETUPPATH
-    all_teacher_names
+    get_all_teacher_names_then_save
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
         teacher $teachername "init"
         if [[ "$?" = "1" ]]; then
@@ -215,6 +215,9 @@ function main() {
             if [[ "$?" = "1" ]]; then
                 echo "Boyle bir hoca yok!"
             fi
+            ;;
+        --all-teacher-names )
+            get_all_teacher_names_then_save
             ;;
         -u | --update )
             update
