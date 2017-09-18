@@ -134,11 +134,11 @@ function teacher() {
     local teacherpath=~/$SETUPPATH/$teachername
     local commandname=$2
     [[ grep "^${teachername}$" ~/$SETUPPATH/teachernames.txt ]] || return 1 # Argumanin hoca olup olmadigini kontrol ediliyor.
-    echo $teachername $teacherlink $teacherpath
+    echo "########### Hoca: " $teachername $teacherlink $teacherpath
     mkdir $teacherpath
-    if [[ "$commandname" == "init" ]]; then
+    if test "$commandname" = "init" ;then
         touch $teacherpath/filelist.txt
-    else if [[ "$commandname" == "update" ]]; then
+    else if [[ "$commandname" == "update" ]];then
         touch $teacherpath/updatefilelist.txt
     fi
     recursive_link_follow $commandname $teachername $teacherlink/file $teacherpath
@@ -169,10 +169,9 @@ function init() {
     mkdir ~/$SETUPPATH
     all_teacher_names
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
-        echo "########### Hocanin Ismi: " $teachername
         teacher $teachername "init"
         if [[ "$?" = "1" ]]; then
-            echo "Boyle bir hoca yok!"
+            echo "Boyle bir hoca yok!: $teachername"
         fi
     done
 }
@@ -181,10 +180,9 @@ function update() {
     # Butun hocalarin dosyalarini guncellenir.
     echo "[+] update() fonksiyonu calistirildi."
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
-        echo "########### Hocanin Ismi: " $teachername
         teacher $teachername "update"
         if [[ "$?" = "1" ]]; then
-            echo "Boyle bir hoca yok!"
+            echo "Boyle bir hoca yok!: $teachername"
         fi
         # Burda updatefilelist.txt ve filelist.txt karsilastiracagiz.
         # Farkli olan link ve dosyalari indiricez. Ve filelist.txt dosyasina ekleyecegiz.
@@ -220,9 +218,6 @@ function main() {
             ;;
         -u | --update )
             update
-            if [[ "$?" = "1" ]]; then
-                echo "Boyle bir hoca yok!"
-            fi
             ;;
         --test )
             test_is_link_a_file
