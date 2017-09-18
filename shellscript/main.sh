@@ -21,7 +21,7 @@ SETUPPATH="all-ytuce-files"
 FILENAME=""
 DIRNAME=""
 
-function delete_tmp_file() {
+function delete_tmp_files() {
     # Gecici dosyalari sil...
     echo "[+] delete_tmp_file() fonksiyonu calistirildi."
     find ~/$SETUPPATH \( -name "source.html" -o -name "links.txt" -o -name "passwordlinks.txt" \) -type f -delete 2> /dev/null
@@ -65,9 +65,9 @@ function is_link_a_file() {
 function parse_link() {
     # Kaynak koddan class ismi uyusanlar hedef dosyasina yaziliyor.
     echo "[+] parse_link() fonksiyonu calistirildi."
-    local $sourcefile=$1
-	  local $classname=$2
-	  local $targetfile=$3
+    local sourcefile=$1
+	  local classname=$2
+	  local targetfile=$3
 	  cat $sourcefile \
         | grep "class=\"$classname\"" \
         | grep -o "$LINK.*><div" \
@@ -110,9 +110,9 @@ function recursive_link_follow() {
     parse_all_links $path source.html links.txt passwordlinks.txt
     cat $path/links.txt
     for href in $(cat $path/links.txt); do
-        is_link_a_file $href
         FILENAME=${href##*/}
         DIRNAME=${href##*/}
+        is_link_a_file $href
         if [ "$?" = "34" ]; then # Demekki indirilebilir dosya.
             echo "Tmm indir. Panpa! :" $href
             if [[ "$commandname" == "init" ]]; then
@@ -122,7 +122,9 @@ function recursive_link_follow() {
                 echo $path/$FILENAME $href >> ~/$SETUPPATH/$teachername/updatefilelist.txt
             fi
         else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
-            mkdir $path/$DIRNAME
+            if [[ "$commandname" == "init" ]]; then
+                mkdir $path/$DIRNAME
+            fi
             recursive_link_follow $commandname $teachername $href $path/$DIRNAME
         fi
     done
@@ -136,12 +138,13 @@ function teacher() {
     local commandname=$2
     grep "^${teachername}$" ~/$SETUPPATH/teachernames.txt || return 1 # Argumanin hoca olup olmadigini kontrol ediliyor.
     echo "########### Hoca: " $teachername $teacherlink $teacherpath
-    mkdir $teacherpath
     if test "$commandname" = "init" ;then
-        touch $teacherpath/filelist.txt
+        mkdir $teacherpath
+        echo -n > $teacherpath/filelist.txt
     elif [[ "$commandname" == "update" ]];then
-        touch $teacherpath/updatefilelist.txt
+        echo -n > touch $teacherpath/updatefilelist.txt
     fi
+    delete_tmp_files
     recursive_link_follow $commandname $teachername $teacherlink/file $teacherpath
 }
 function test_get_all_teacher_names_then_save() {
@@ -229,7 +232,7 @@ function main() {
             init
             ;;
         -t | --teacher )
-            teacher $teachername
+            teacher $teachername "init"
             if [[ "$?" = "1" ]]; then
                 echo "Boyle bir hoca yok!"
             fi
