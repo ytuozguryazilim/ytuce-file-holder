@@ -118,7 +118,7 @@ function recursive_link_follow() {
             if [[ "$commandname" == "init" ]]; then
                 echo $path/$FILENAME $href >> ~/$SETUPPATH/$teachername/filelist.txt
                 download_file $href $path
-            else if [[ "$commandname" == "update" ]]; then
+            elif [[ "$commandname" == "update" ]]; then
                 echo $path/$FILENAME $href >> ~/$SETUPPATH/$teachername/updatefilelist.txt
             fi
         else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
@@ -134,15 +134,33 @@ function teacher() {
     local teacherlink=${LINK}${teachername}
     local teacherpath=~/$SETUPPATH/$teachername
     local commandname=$2
-    [[ grep "^${teachername}$" ~/$SETUPPATH/teachernames.txt ]] || return 1 # Argumanin hoca olup olmadigini kontrol ediliyor.
+    grep "^${teachername}$" ~/$SETUPPATH/teachernames.txt || return 1 # Argumanin hoca olup olmadigini kontrol ediliyor.
     echo "########### Hoca: " $teachername $teacherlink $teacherpath
     mkdir $teacherpath
     if test "$commandname" = "init" ;then
         touch $teacherpath/filelist.txt
-    else if [[ "$commandname" == "update" ]];then
+    elif [[ "$commandname" == "update" ]];then
         touch $teacherpath/updatefilelist.txt
     fi
     recursive_link_follow $commandname $teachername $teacherlink/file $teacherpath
+}
+function test_get_all_teacher_names_then_save() {
+    # get_all_teacher_name_then_save fonksiyonu test
+    # Test etmek icin "teachernames.txt" dosyasina ihtiyacimiz var.
+    if [[ -e ~/$SETUPPATH/teachernames.txt ]]; then
+        mv ~/$SETUPPATH/teachernames.txt ~/$SETUPPATH/oldteachernames.txt
+        get_all_teacher_names_then_save
+        diff ~/$SETUPPATH/teachernames.txt ~/$SETUPPATH/oldteachernames.txt
+        if [[ "$?" = "0" ]]; then
+            echo "[+] 2 dosyada ayni oldugu icin dogru calisiyor."
+        else
+            echo "[-] 2 dosyada farklidir."
+        fi
+        return 0
+    else
+        echo "Uzgunuz. 'teachernames.txt' dosyasi olmasi gerekiyor."
+        return 1
+    fi
 }
 function get_all_teacher_names_then_save() {
     # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
