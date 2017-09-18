@@ -163,6 +163,27 @@ function init() {
         fi
     done
 }
+function update_teacher_files() {
+    # Bir hocanin dosyalari gunceller. Guncellerken links sayisinda degisiklige bakmali(Ama en icten baslamali).
+    echo "[+] update_teacher_files() fonksiyonu calistirildi."
+    local teachername=$1
+    local teacherlink=${LINK}${teachername}
+    [[ grep "^${teachername}$" ~/$SETUPPATH/teachernames.txt ]] || return 1 # Argumanin hoca olup olmadigini kontrol ediliyor.
+    echo $teachername $teacherlink
+    download_source_code $teacherlink/file ~/$SETUPPATH/$teachername/source.html
+    # all_parse_links
+}
+function update() {
+    # Butun hocalarin dosyalarini gunceller.
+    echo "[+] update() fonksiyonu calistirildi."
+    for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
+        echo "########### Hocanin Ismi: " $teachername
+        update_teacher_files $teachername
+        if [[ "$?" = "1" ]]; then
+            echo "Boyle bir hoca yok!"
+        fi
+    done
+}
 function usage() {
     echo "./main.sh "
     echo -e "\t-h --help                  : scriptin kilavuzu."
@@ -187,6 +208,9 @@ function main() {
             if [[ "$?" = "1" ]]; then
                 echo "Boyle bir hoca yok!"
             fi
+            ;;
+        -u | --update )
+            update
             ;;
         --test )
             test_is_link_a_file
