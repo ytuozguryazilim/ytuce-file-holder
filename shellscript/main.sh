@@ -97,7 +97,7 @@ function download_source_code() {
     echo "[+] download_source_code() fonksiyonu calistirildi."
     local link=$1
     local path=$2
-    wget --no-check-certificate $link -O $path/source.html
+    wget --no-check-certificate $link -O $path
 }
 function recursive_link_follow() {
     # Recursive sekilde linklerin kaynak kodlarindaki linkleri takip edicek.
@@ -105,7 +105,7 @@ function recursive_link_follow() {
     local link=$1
     local path=$2
     echo $link $path
-    download_source_code $link $path
+    download_source_code $link $path/source.html
     parse_all_links $path
     cat $path/links.txt
     for href in $(cat $path/links.txt); do
@@ -134,7 +134,7 @@ function all_teacher_names() {
     # Sitenin kisiler sayfasinin kaynak kodunu indiriyoruz. Sonra parse ediyoruz.
     # Burdaki tum personal isimleri aliniyor. Sonra hoca olanlar "teachernames.txt" dosyasina ekleniyor.
     echo "[+] all_teacher_names() fonksiyonu calistirildi."
-    wget --no-check-certificate $PROFILES_URL -O ~/$SETUPPATH/personalssource.html
+    download_source_code $PROFILES_URL -O ~/$SETUPPATH/personalssource.html
     result=$(cat ~/$SETUPPATH/personalssource.html \
                  | grep -o "/personal.*><img" \
                  | sed 's/"><img//' \
@@ -168,6 +168,7 @@ function usage() {
     echo -e "\t-h --help                  : scriptin kilavuzu."
     echo -e "\t-i --init                  : butun hocalarin dosyalarini sifirdan indir."
     echo -e "\t-t --teacher [HocaninIsmi] : belli bir hocanin dosyalari indir."
+    echo -e "\t--test                     : test fonksiyonlar calistirilir."
     echo ""
 }
 function main() {
