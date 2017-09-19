@@ -21,6 +21,7 @@ LINK="https://www.ce.yildiz.edu.tr/personal/"
 SETUPPATH="all-ytuce-files"
 FILENAME=""
 DIRNAME=""
+SLEEPTIME="1" # Her linkin kaynak kodunu ve Her dosya indirmeden once bekleniyecek saniye 
 
 function delete_tmp_files() {
     # Gecici dosyalari sil...
@@ -31,11 +32,11 @@ function delete_tmp_files() {
 }
 function download_file() {
     # Dosya indiriliyor.
-    # Burda indirilicek dosyanin path'inin dizinleri var mi kontrol edilmeli.
     echo "[+] download_file() fonksiyonu calistirildi."
     local link=$1
     local path=$2
     FILENAME=${path##*/}
+    sleep $SLEEPTIME
     wget --no-check-certificate $link -O $path/$FILENAME
 }
 function test_is_link_a_file() {
@@ -101,6 +102,7 @@ function download_source_code() {
     echo "[+] download_source_code() fonksiyonu calistirildi."
     local link=$1
     local path=$2
+    sleep $SLEEPTIME
     wget --no-check-certificate $link -O $path
 }
 function recursive_link_follow() {
@@ -118,7 +120,7 @@ function recursive_link_follow() {
         DIRNAME=${href##*/}
         is_link_a_file $href
         if [ "$?" = "34" ]; then # Demekki indirilebilir dosya.
-            echo "Tmm indir. Panpa! :" $href
+            echo "Tmm indirilebilir dosya. Panpa! :" $href
             if [[ "$commandname" == "init" ]]; then
                 echo $path/$FILENAME $href >> ~/$SETUPPATH/$teachername/filelist.txt
                 download_file $href $path
