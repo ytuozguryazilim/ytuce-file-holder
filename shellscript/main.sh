@@ -227,7 +227,7 @@ function update() {
                 filelink=$changeline
                 index=0
                 download_file $filelink $filepath
-                echo $filepath $filelink >> filelist.txt
+                echo $filepath $filelink >> ~/$SETUPPATH/$teachername/filelist.txt
             fi
         done
         rm ~/$SETUPPATH/$teachername/updatefilelist.txt
