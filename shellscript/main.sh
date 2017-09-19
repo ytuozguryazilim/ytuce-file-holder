@@ -9,12 +9,13 @@
 
 ### Global Variables ###
 NON_PERSONS=("fkord" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "BTYLkoord" "tkoord"
-             "filiz" "kazim" "sunat" "burak" )
+             "filiz" "kazim" "sunat" "burak")
 ICONS=("fileicon" "foldericon" # Parola konulmamis dosya ve dizin.
        "passwordfileicon" "passwordfoldericon") # Parolasi olan dosya ve dizin.
 DOWNLOADABLE_FILE_EXTENSIONS=("rar" "zip" "gz" # Arsivlenmis ve Sıkıştırılmış dosyalar.
                               "pdf" "doc" "docx" "ppt" "png" "jpg" "jpe" # Dokumanlar ve resimler.
                               "java" "cpp" "c" "asm" "txt") # Kodlar.
+DELETE_FILES=("source.html" "links.txt" "passwordlinks.txt" "updatefilelist.txt")
 PROFILES_URL="https://www.ce.yildiz.edu.tr/subsites"
 LINK="https://www.ce.yildiz.edu.tr/personal/"
 SETUPPATH="all-ytuce-files"
@@ -24,10 +25,13 @@ DIRNAME=""
 function delete_tmp_files() {
     # Gecici dosyalari sil...
     echo "[+] delete_tmp_file() fonksiyonu calistirildi."
-    find ~/$SETUPPATH \( -name "source.html" -o -name "links.txt" -o -name "passwordlinks.txt" \) -type f -delete 2> /dev/null
+    for deletefilename in ${DELETE_FILES[@]}; do
+         find ~/$SETUPPATH -name $deletefilename -type f -delete 2> /dev/null
+    done
 }
 function download_file() {
     # Dosya indiriliyor.
+    # Burda indirilicek dosyanin path'inin dizinleri var mi kontrol edilmeli.
     echo "[+] download_file() fonksiyonu calistirildi."
     local link=$1
     local path=$2
