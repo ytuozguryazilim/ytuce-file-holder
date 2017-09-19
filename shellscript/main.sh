@@ -142,9 +142,8 @@ function teacher() {
         mkdir $teacherpath
         echo -n > $teacherpath/filelist.txt
     elif [[ "$commandname" == "update" ]];then
-        echo -n > touch $teacherpath/updatefilelist.txt
+        echo -n > $teacherpath/updatefilelist.txt
     fi
-    delete_tmp_files
     recursive_link_follow $commandname $teachername $teacherlink/file $teacherpath
 }
 function test_get_all_teacher_names_then_save() {
@@ -195,20 +194,41 @@ function init() {
             echo "Boyle bir hoca yok!: $teachername"
         fi
     done
+    delete_tmp_files
 }
 
 function update() {
     # Butun hocalarin dosyalarini guncellenir.
     echo "[+] update() fonksiyonu calistirildi."
+    local index=0
+    local filepath=""
+    local filelink=""
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
         teacher $teachername "update"
         if [[ "$?" = "1" ]]; then
             echo "Boyle bir hoca yok!: $teachername"
         fi
         # Burda updatefilelist.txt ve filelist.txt karsilastiracagiz.
-        # Farkli olan link ve dosyalari indiricez. Ve filelist.txt dosyasina ekleyecegiz.
+        # Farkli olan link ve dosyalari indiricez. Ve filelist.txt dosyasina path ve link ekleyecegiz.
         # Sonrasinda updatefilelist.txt dosyasini silicez.
+        changelines=$(diff ~/$SETUPPATH/$teachername/filelist.txt ~/$SETUPPATH/$teachername/updatefilelist.txt \
+            | grep ">" \
+            | sed 's/> //g')
+        for changeline in ${changelines}; do
+            echo $changeline $index
+            if [[ "$index" == "0" ]]; then
+                filepath=$changeline
+                index=1
+            elif [[ "$index" == "1" ]]; then
+                filelink=$changeline
+                index=0
+                download_file $filelink $filepath
+                echo $filepath $filelink >> filelist.txt
+            fi
+        done
+        rm ~/$SETUPPATH/$teachername/updatefilelist.txt
     done
+    delete_tmp_files
 }
 function usage() {
     echo "./main.sh "
