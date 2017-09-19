@@ -13,7 +13,7 @@ NON_PERSONS=("fkord" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mk
 ICONS=("fileicon" "foldericon" # Parola konulmamis dosya ve dizin.
        "passwordfileicon" "passwordfoldericon") # Parolasi olan dosya ve dizin.
 DOWNLOADABLE_FILE_EXTENSIONS=("rar" "zip" "gz" # Arsivlenmis ve Sıkıştırılmış dosyalar.
-                              "pdf" "doc" "docx" "ppt" "png" "jpg" "jpe" # Dokumanlar ve resimler.
+                              "pdf" "doc" "docx" "ppt" "pptx" "png" "jpg" "jpe" # Dokumanlar ve resimler.
                               "java" "cpp" "c" "asm" "txt") # Kodlar.
 DELETE_FILES=("source.html" "links.txt" "passwordlinks.txt" "updatefilelist.txt")
 PROFILES_URL="https://www.ce.yildiz.edu.tr/subsites"
@@ -126,7 +126,7 @@ function recursive_link_follow() {
                 echo $path/$FILENAME $href >> ~/$SETUPPATH/$teachername/updatefilelist.txt
             fi
         else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
-            if [[ "$commandname" == "init" ]]; then
+            if [ ! -d $path/$DIRNAME ]; then
                 mkdir $path/$DIRNAME
             fi
             recursive_link_follow $commandname $teachername $href $path/$DIRNAME
