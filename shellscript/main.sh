@@ -35,9 +35,9 @@ function download_file() {
     echo "[+] download_file() fonksiyonu calistirildi."
     local link=$1
     local path=$2
-    FILENAME=${path##*/}
     sleep $SLEEPTIME
-    wget --no-check-certificate $link -O $path/$FILENAME
+    echo $link $path
+    wget --no-check-certificate $link -O $path
 }
 function test_is_link_a_file() {
     local testinputs=("https://www.ce.yildiz.edu.tr/personal/furkan/Hibernate.rar"
@@ -236,6 +236,35 @@ function update() {
     done
     delete_tmp_files
 }
+function control() {
+    # Her hocanin filelist.txt dosyasindaki dosya, dizinin icinde var mi kontrol edilecek. Eger yoksa indirilecek.
+    local index=0
+    local flag=0
+    local filepath=""
+    local filelink=""
+    for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
+        echo $teachername
+        for path in $(cat ~/$SETUPPATH/$teachername/filelist.txt); do
+            if [[ "$index" == "0" ]]; then
+                filepath=$path
+                index=1
+                if [ ! -e $filepath ]; then
+                    flag=1
+                    echo $filepath
+                fi
+            elif [[ "$index" == "1" ]]; then
+                filelink=$path
+                index=0
+                if [[ "$flag" == "1" ]]; then
+                    download_file $filelink $filepath
+                    flag=0
+                fi
+            fi
+        done
+    done
+    delete_tmp_files
+}
+
 function usage() {
     echo "./main.sh "
     echo -e "\t-h --help                  : scriptin kilavuzu."
@@ -243,6 +272,7 @@ function usage() {
     echo -e "\t-t --teacher [HocaninIsmi] : belli bir hocanin dosyalari indir."
     echo -e "\t--all-teacher-names        : butun hoca isimleri teachernames.txt dosyasina kaydeder."
     echo -e "\t-u --uptate                : hocalarin dosyalari guncellenir."
+    echo -e "\t-c --control               : her hocanin filelist.txt dosyasindaki linkleri control eder."
     echo -e "\t--test                     : test fonksiyonlar calistirilir."
     echo ""
 }
@@ -268,6 +298,9 @@ function main() {
             ;;
         -u | --update )
             update
+            ;;
+        -c | --control )
+            control
             ;;
         --test )
             test_is_link_a_file
