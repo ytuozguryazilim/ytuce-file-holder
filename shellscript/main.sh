@@ -10,8 +10,8 @@
 ### Global Variables ###
 NON_PERSONS=("fkord" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mkoord" "BTYLkoord" "tkoord"
              "filiz" "kazim" "sunat" "burak")
-ICONS=("fileicon" "foldericon" # Parola konulmamis dosya ve dizin.
-       "passwordfileicon" "passwordfoldericon") # Parolasi olan dosya ve dizin.
+CLASSNAMES=("fileicon" "foldericon" # Parola konulmamis dosya ve dizin.
+            "passwordfileicon" "passwordfoldericon") # Parolasi olan dosya ve dizin.
 DOWNLOADABLE_FILE_EXTENSIONS=("rar" "zip" "gz" # Arsivlenmis ve Sıkıştırılmış dosyalar.
                               "pdf" "doc" "docx" "ppt" "pptx" "png" "jpg" "jpe" # Dokumanlar ve resimler.
                               "java" "cpp" "c" "asm" "txt") # Kodlar.
@@ -87,7 +87,7 @@ function parse_all_links() {
     local sourcefilename=$2
     local linksfilename=$3
     local passwordlinksfilename=$4
-    for classname in "${ICONS[@]}"; do
+    for classname in "${CLASSNAMES[@]}"; do
         if [[ $classname == *"password"* ]]; then # "$classname" degiskeninin icinde "password" diye bir string var mi?
             parse_link $path/$sourcefilename $classname $path/$passwordlinksfilename
         else
@@ -206,7 +206,6 @@ function init() {
 function update() {
     # Butun hocalarin dosyalarini guncellenir.
     echo "[+] update() fonksiyonu calistirildi."
-    local index=0
     local filepath=""
     local filelink=""
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
@@ -220,46 +219,41 @@ function update() {
         changelines=$(diff ~/$SETUPPATH/$teachername/filelist.txt ~/$SETUPPATH/$teachername/updatefilelist.txt \
             | grep ">" \
             | sed 's/> //g')
+        # Burda degisik olan satirlar alinir. IFS ' ' karakterinden '\n' yapmamizin sebebi,
+        # osyaya her satirda path'i ve link'i aralarinda bir bosluk koyarak kaydettigimiz icin for dongusunde tek tek geliyor.
+        # Onu onlemek icin IFS yi degistirerek parcalanmayi ' ' tan '\n' cevirdik.
+        # Sonrasinda gelen satiri IFS tekrardan ' ' yaparak 2 degiskene kaydediyoruz.
+        # Sonrasinda dosyayi indir, ve boyle bir dosya indirdigimizi hocanin filelist.txt dosyasina kaydet.
+        OLDIFS=$IFS
+        IFS=$'\n'
         for changeline in ${changelines}; do
-            echo $changeline $index
-            if [[ "$index" == "0" ]]; then
-                filepath=$changeline
-                index=1
-            elif [[ "$index" == "1" ]]; then
-                filelink=$changeline
-                index=0
-                download_file $filelink $filepath
-                echo $filepath $filelink >> ~/$SETUPPATH/$teachername/filelist.txt
-            fi
+            echo $changeline
+            IFS=$' '
+            read filepath filelink <<< $changeline
+            download_file $filelink $filepath
+            echo $filepath $filelink >> ~/$SETUPPATH/$teachername/filelist.txt
         done
+        IFS=$OLDIFS
         rm ~/$SETUPPATH/$teachername/updatefilelist.txt
     done
     delete_tmp_files
 }
 function control() {
     # Her hocanin filelist.txt dosyasindaki dosya, dizinin icinde var mi kontrol edilecek. Eger yoksa indirilecek.
-    local index=0
-    local flag=0
     local filepath=""
     local filelink=""
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
         echo $teachername
-        for path in $(cat ~/$SETUPPATH/$teachername/filelist.txt); do
-            if [[ "$index" == "0" ]]; then
-                filepath=$path
-                index=1
-                if [ ! -e $filepath ]; then
-                    flag=1
-                    echo $filepath
-                fi
-            elif [[ "$index" == "1" ]]; then
-                filelink=$path
-                index=0
-                if [[ "$flag" == "1" ]]; then
-                    download_file $filelink $filepath
-                    flag=0
-                fi
+        OLDIFS=$IFS
+        IFS=$'\n'
+        for line in $(cat ~/$SETUPPATH/$teachername/filelist.txt); do
+            echo $line
+            IFS=$' '
+            read filepath filelink <<< $line
+            if [ ! -e $filepath ]; then
+                download_file $filelink $filepath
             fi
+            IFS=$OLDIFS
         done
     done
     delete_tmp_files
