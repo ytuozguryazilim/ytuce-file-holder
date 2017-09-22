@@ -238,11 +238,13 @@ function update() {
         fi
         # Burda updatefilelist.txt ve filelist.txt karsilastiracagiz.
         # 2 Yontem var.
-        method1 $teachername
+        # method1 $teachername
+        method2 $teachername
     done
     delete_tmp_files
 }
-function make_unique_lines() {
+
+function make_unique_lines_all_teacher() {
     # Her hocanin altindaki filelist.txt dosyasini siralayip unique satirlari aliyoruz.
     local teacherpath=''
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
@@ -315,7 +317,7 @@ function main() {
             test_is_link_a_file
             ;;
         -f | --feature )
-            make_unique_lines
+            make_unique_lines_all_teacher
             ;;
         * )
             echo "Error: unknown parameter \"$1\""
