@@ -202,43 +202,46 @@ function init() {
     done
     delete_tmp_files
 }
-
+function method1() {
+    local teachername=$1
+    local filepath=""
+    local filelink=""
+    # Farkli olan link ve dosyalari indiricez. Ve filelist.txt dosyasina path ve link ekleyecegiz.
+    # Sonrasinda updatefilelist.txt dosyasini silicez.
+    changelines=$(diff ~/$SETUPPATH/$teachername/filelist.txt ~/$SETUPPATH/$teachername/updatefilelist.txt \
+        | grep ">" \
+        | sed 's/> //g')
+    # Burda degisik olan satirlar alinir. IFS ' ' karakterinden '\n' yapmamizin sebebi,
+    # osyaya her satirda path'i ve link'i aralarinda bir bosluk koyarak kaydettigimiz icin for dongusunde tek tek geliyor.
+    # Onu onlemek icin IFS yi degistirerek parcalanmayi ' ' tan '\n' cevirdik.
+    # Sonrasinda gelen satiri IFS tekrardan ' ' yaparak 2 degiskene kaydediyoruz.
+    # Sonrasinda dosyayi indir, ve boyle bir dosya indirdigimizi hocanin filelist.txt dosyasina kaydet.
+    OLDIFS=$IFS
+    IFS=$'\n'
+    for changeline in ${changelines}; do
+        echo $changeline
+        IFS=$' '
+        read filepath filelink <<< $changeline
+        download_file $filelink $filepath
+        echo $filepath $filelink >> ~/$SETUPPATH/$teachername/filelist.txt
+    done
+    IFS=$OLDIFS
+    rm ~/$SETUPPATH/$teachername/updatefilelist.txt
+}
 function update() {
     # Butun hocalarin dosyalarini guncellenir.
     echo "[+] update() fonksiyonu calistirildi."
-    local filepath=""
-    local filelink=""
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
         teacher $teachername "update"
         if [[ "$?" = "1" ]]; then
             echo "Boyle bir hoca yok!: $teachername"
         fi
         # Burda updatefilelist.txt ve filelist.txt karsilastiracagiz.
-        # Farkli olan link ve dosyalari indiricez. Ve filelist.txt dosyasina path ve link ekleyecegiz.
-        # Sonrasinda updatefilelist.txt dosyasini silicez.
-        changelines=$(diff ~/$SETUPPATH/$teachername/filelist.txt ~/$SETUPPATH/$teachername/updatefilelist.txt \
-            | grep ">" \
-            | sed 's/> //g')
-        # Burda degisik olan satirlar alinir. IFS ' ' karakterinden '\n' yapmamizin sebebi,
-        # osyaya her satirda path'i ve link'i aralarinda bir bosluk koyarak kaydettigimiz icin for dongusunde tek tek geliyor.
-        # Onu onlemek icin IFS yi degistirerek parcalanmayi ' ' tan '\n' cevirdik.
-        # Sonrasinda gelen satiri IFS tekrardan ' ' yaparak 2 degiskene kaydediyoruz.
-        # Sonrasinda dosyayi indir, ve boyle bir dosya indirdigimizi hocanin filelist.txt dosyasina kaydet.
-        OLDIFS=$IFS
-        IFS=$'\n'
-        for changeline in ${changelines}; do
-            echo $changeline
-            IFS=$' '
-            read filepath filelink <<< $changeline
-            download_file $filelink $filepath
-            echo $filepath $filelink >> ~/$SETUPPATH/$teachername/filelist.txt
-        done
-        IFS=$OLDIFS
-        rm ~/$SETUPPATH/$teachername/updatefilelist.txt
+        # 2 Yontem var.
+        method1 $teachername
     done
     delete_tmp_files
 }
-
 function make_unique_lines() {
     # Her hocanin altindaki filelist.txt dosyasini siralayip unique satirlari aliyoruz.
     local teacherpath=''
@@ -278,6 +281,7 @@ function usage() {
     echo -e "\t--all-teacher-names        : butun hoca isimleri teachernames.txt dosyasina kaydeder."
     echo -e "\t-u --uptate                : hocalarin dosyalari guncellenir."
     echo -e "\t-c --control               : her hocanin filelist.txt dosyasindaki linkleri control eder."
+    echo -e "\t-f --feature               : scriptin yeni ozelligi calistirilir."
     echo -e "\t--test                     : test fonksiyonlar calistirilir."
     echo ""
 }
