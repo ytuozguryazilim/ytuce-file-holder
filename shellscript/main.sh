@@ -244,7 +244,22 @@ function update() {
     delete_tmp_files
 }
 
-function make_unique_lines_all_teacher() {
+function method2() {
+    local teachername=$1
+    local teacherpath=~/$SETUPPATH/$teachername
+    cat $teacherpath/updatefilelist.txt >> $teacherpath/filelist.txt
+    make_unique_lines_teacher $teachername
+}
+
+function make_unique_lines_teacher() {
+    local teachername=$1
+    local teacherpath=~/$SETUPPATH/$teachername
+    sort $teacherpath/filelist.txt \
+            | uniq > $teacherpath/filelist_update.txt
+    mv $teacherpath/filelist_update.txt $teacherpath/filelist.txt
+}
+
+function make_unique_lines_all_teachers() {
     # Her hocanin altindaki filelist.txt dosyasini siralayip unique satirlari aliyoruz.
     local teacherpath=''
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
@@ -317,7 +332,7 @@ function main() {
             test_is_link_a_file
             ;;
         -f | --feature )
-            make_unique_lines_all_teacher
+            make_unique_lines_all_teachers
             ;;
         * )
             echo "Error: unknown parameter \"$1\""
