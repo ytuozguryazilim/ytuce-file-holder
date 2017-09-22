@@ -238,6 +238,18 @@ function update() {
     done
     delete_tmp_files
 }
+
+function make_unique_lines() {
+    # Her hocanin altindaki filelist.txt dosyasini siralayip unique satirlari aliyoruz.
+    local teacherpath=''
+    for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
+        echo $teachername
+        teacherpath=~/$SETUPPATH/$teachername
+        sort $teacherpath/filelist.txt \
+            | uniq > $teacherpath/filelist_update.txt
+        mv $teacherpath/filelist_update.txt $teacherpath/filelist.txt
+    done
+}
 function control() {
     # Her hocanin filelist.txt dosyasindaki dosya, dizinin icinde var mi kontrol edilecek. Eger yoksa indirilecek.
     local filepath=""
@@ -256,7 +268,6 @@ function control() {
             IFS=$OLDIFS
         done
     done
-    delete_tmp_files
 }
 
 function usage() {
@@ -298,6 +309,9 @@ function main() {
             ;;
         --test )
             test_is_link_a_file
+            ;;
+        -f | --feature )
+            make_unique_lines
             ;;
         * )
             echo "Error: unknown parameter \"$1\""
