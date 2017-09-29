@@ -226,7 +226,6 @@ function method1() {
         echo $filepath $filelink >> ~/$SETUPPATH/$teachername/filelist.txt
     done
     IFS=$OLDIFS
-    rm ~/$SETUPPATH/$teachername/updatefilelist.txt
 }
 function update() {
     # Butun hocalarin dosyalarini guncellenir.
