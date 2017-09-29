@@ -64,9 +64,12 @@ function is_link_a_file() {
     # Sonrasinda Indirilecek dosya olup olmadigini kontrol ediyoruz.
     # Eger indirilecek dosya ise 34 donuyoruz, degil ise 0 donuyoruz.
     # https://stackoverflow.com/questions/14366390/check-if-an-element-is-present-in-a-bash-array
+    # Belki Makefile olabilir.
     echo "[+] is_link_a_file() fonksiyonu calistirildi."
     local link=$1
+    local filename=${link##*/}
     local extension=${link##*.}
+    if test "$filename" = "Makefile" ;then return return 34; fi
     if [[ " ${DOWNLOADABLE_FILE_EXTENSIONS[@]} " = *" $extension "* ]]; then return 34; fi
     return 0
 }
