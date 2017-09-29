@@ -1,5 +1,6 @@
 # ytuce-file-holder
-Her hocanin dosyalari takip eden ve indiren shell script
+Her hocanin dosyalari takip eden ve indiren script. Suanlik shell script calisiyor.
+Yuksek ihtimal sadece shell script gelistirilecek.
 
 # Kurulum ve Deneme
 
@@ -7,7 +8,7 @@ Her hocanin dosyalari takip eden ve indiren shell script
 $ git clone https://github.com/GnuYtuce/ytuce-file-holder
 $ ### Shellscript'i calistirma
 $ cd ytuce-file-holder/shellscript
-$ ./main.sh --help > file.log 2>&1     # file.log  dosyasi olusturulur.
+$ ./main.sh --update > file.log 2>&1     # file.log  dosyasi olusturulur.
 ```
 
 # Kullanimi
@@ -17,3 +18,7 @@ $ ./main.sh [-h|--help]     # Bu komutu calistir, parametre kullanimi anlatiliyo
 $ ./main.sh -h
 $ ./main.sh --help
 ```
+
+# Task listesi
+- [ ] Daha Script kolay indirilip kullanilabilir olmali.
+- [ ] 2 kisima ayir, ilk link adreslerini ve path dosyaya kaydetsin. Sonra indirmeye baslasin.
