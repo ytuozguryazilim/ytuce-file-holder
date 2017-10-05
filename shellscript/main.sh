@@ -16,8 +16,8 @@ DOWNLOADABLE_FILE_EXTENSIONS=("rar" "zip" "gz" "7z" "bz2" # Arsivlenmis ve SÄ±kÄ
                               "pdf" "PDF" "odp" "doc" "docx" "docm" "ppt" "pptx" "ppsx" "xls" "xlsx" # Dokumanlar
                               "png" "jpg" "jpe" "mp3" "mp4" # Resimler, sesler ve videolar.
                               "jar" "exe" # programlar ya da kutuphaneler.
-                              "java" "cpp" "c" "asm" "pl" "sql" "backup" "txt") # Kodlar.
-                              "exp" "com" "pcapng" "iocal" "local" "option" "tif" "bmp" "ace" # digerleri
+                              "java" "cpp" "c" "asm" "pl" "sql" "backup" "txt" # Kodlar.
+                              "exp" "com" "pcapng" "iocal" "local" "option" "tif" "bmp" "ace") # digerleri
 DELETE_FILES=("source.html" "links.txt" "passwordlinks.txt" "updatefilelist.txt")
 PROFILES_URL="https://www.ce.yildiz.edu.tr/subsites"
 LINK="https://www.ce.yildiz.edu.tr/personal/"
