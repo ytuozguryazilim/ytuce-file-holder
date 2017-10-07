@@ -4,7 +4,7 @@
 # Description: track files in ytuce     #
 # Maintainer: undefined                 #
 # License: GPL3.0                       #
-# Version: 1.4.0                        #
+# Version: 1.6.0                        #
 #=======================================#
 
 ### Global Variables ###
@@ -69,8 +69,8 @@ function is_link_a_file() {
     local link=$1
     local filename=${link##*/}
     local extension=${link##*.}
-    if test "$filename" = "Makefile" ;then return return 34; fi
-    if [[ " ${DOWNLOADABLE_FILE_EXTENSIONS[@]} " = *" $extension "* ]]; then return 34; fi
+    [ $filename == "Makefile" ] && return 34
+    [[ " ${DOWNLOADABLE_FILE_EXTENSIONS[@]} " == *" $extension "* ]] && return 34
     return 0
 }
 function parse_link() {
@@ -134,9 +134,7 @@ function recursive_link_follow() {
                 echo $path/$FILENAME $href >> ~/$SETUPPATH/$teachername/updatefilelist.txt
             fi
         else # Demekki baska bir dizine gidiyoruz. Baska bir dizine gectigimiz icin onun dizinini olusturmaliyiz.
-            if [ ! -d $path/$DIRNAME ]; then
-                mkdir $path/$DIRNAME
-            fi
+            [ ! -d $path/$DIRNAME ] && mkdir $path/$DIRNAME
             recursive_link_follow $commandname $teachername $href $path/$DIRNAME
         fi
     done
@@ -187,8 +185,7 @@ function get_all_teacher_names_then_save() {
                  | sed 's/\/personal\///' \
                  | sort \
                  | uniq )
-    for personalname in $personalnames
-    do
+    for personalname in $personalnames; do
         if [[ ! " ${NON_PERSONS[*]} " == *" $personalname "* ]]; then
             echo ${personalname} >> ~/$SETUPPATH/teachernames.txt
         fi
@@ -238,9 +235,7 @@ function update() {
     echo "[+] update() fonksiyonu calistirildi."
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
         teacher $teachername "update"
-        if [[ "$?" = "1" ]]; then
-            echo "Boyle bir hoca yok!: $teachername"
-        fi
+        [[ "$?" != "0" ]] && echo "Boyle bir hoca yok!: $teachername"; exit 1
         # Burda updatefilelist.txt ve filelist.txt karsilastiracagiz.
         # 2 Yontem var.
         # method1 $teachername
@@ -312,38 +307,35 @@ function main() {
     local teachername=$2
     case "$argument" in
         -h | --help )
-            usage
-            exit 0
-            ;;
+            usage; exit 0
+        ;;
         -i | --init )
             init
-            ;;
+        ;;
         -t | --teacher )
             teacher $teachername "init"
-            if [[ "$?" = "1" ]]; then
-                echo "Boyle bir hoca yok!"
-            fi
-            ;;
+            [[ "$?" = "1" ]] && echo "Boyle bir hoca yok!"
+        ;;
         --all-teacher-names )
             get_all_teacher_names_then_save
-            ;;
+        ;;
         -u | --update )
             update
-            ;;
+        ;;
         -c | --control )
             control
-            ;;
+        ;;
         --test )
             test_is_link_a_file
-            ;;
+        ;;
         -f | --feature )
             make_unique_lines_all_teachers
-            ;;
+        ;;
         * )
             echo "Error: unknown parameter \"$1\""
             usage
             exit 1
-            ;;
+        ;;
     esac
 }
 
