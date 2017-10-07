@@ -241,10 +241,14 @@ function update() {
         # method1 $teachername
         method2 $teachername
     done
+    # Update(-u) komutundan sonra Control(-c) komutunu da calistirmaliyiz.
+    # Cunku update komutunda sadece yeni gelen dosyalarin listesini filelist.txt dosyasina kaydediyoruz.
+    # Sonrasinda control komutuyla filelist.txt de bulunan ama dizinde bulunmayan dosyalari indiriyoruz.
     delete_tmp_files
 }
 
 function method2() {
+    # Bu methodta updatefilelist.txt deki pathleri ve linkleri, guncel olmayan dosyanin sonuna ekliyoruz.
     local teachername=$1
     local teacherpath=~/$SETUPPATH/$teachername
     cat $teacherpath/updatefilelist.txt >> $teacherpath/filelist.txt
@@ -252,6 +256,7 @@ function method2() {
 }
 
 function make_unique_lines_teacher() {
+    # Burda hocanin filelist.txt dosyasinda bulunan satirlarini siralayip, unique linelari birakiyoruz.
     local teachername=$1
     local teacherpath=~/$SETUPPATH/$teachername
     sort $teacherpath/filelist.txt \
