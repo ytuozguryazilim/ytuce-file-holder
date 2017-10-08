@@ -160,9 +160,7 @@ function init() {
     get_all_teacher_names_then_save
     for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
         teacher $teachername "init"
-        if [[ "$?" = "1" ]]; then
-            echo "Boyle bir hoca yok!: $teachername"
-        fi
+        [[ "$?" = "1" ]] && echo "Boyle bir hoca yok!: $teachername"
     done
     delete_tmp_files
 }
@@ -245,9 +243,7 @@ function control() {
             echo $line
             IFS=$' '
             read filepath filelink <<< $line
-            if [ ! -e $filepath ]; then
-                download_file $filelink $filepath
-            fi
+            [ ! -e $filepath ] && download_file $filelink $filepath
             IFS=$OLDIFS
         done
     done
