@@ -6,7 +6,7 @@
 # License: GPL3.0                       #
 # Version: 2.0.0                        #
 #=======================================#
-source ./util.sh
+source ~/Documents/pleycpl/ytuce-file-holder/shellscript/util.sh
 function main() {
     local argument=$1
     local teachername=$2

@@ -189,26 +189,11 @@ function method1() {
     done
     IFS=$OLDIFS
 }
-function update() {
-    # Butun hocalarin dosyalarini guncellenir.
-    echo "[+] update() fonksiyonu calistirildi."
-    for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
-        teacher $teachername "update"
-        [[ "$?" != "0" ]] && echo "Boyle bir hoca yok!: $teachername"; exit 1
-        # Burda updatefilelist.txt ve filelist.txt karsilastiracagiz.
-        # 2 Yontem var.
-        # method1 $teachername
-        method2 $teachername
-    done
-    # Update(-u) komutundan sonra Control(-c) komutunu da calistirmaliyiz.
-    # Cunku update komutunda sadece yeni gelen dosyalarin listesini filelist.txt dosyasina kaydediyoruz.
-    # Sonrasinda control komutuyla filelist.txt de bulunan ama dizinde bulunmayan dosyalari indiriyoruz.
-    delete_tmp_files
-}
 function method2() {
     # Bu methodta updatefilelist.txt deki pathleri ve linkleri, guncel olmayan dosyanin sonuna ekliyoruz.
     local teachername=$1
     local teacherpath=~/$SETUPPATH/$teachername
+    echo "[+] method2() fonksiyonu calistirildi."
     cat $teacherpath/updatefilelist.txt >> $teacherpath/filelist.txt
     make_unique_lines_teacher $teachername
 }
@@ -216,6 +201,7 @@ function make_unique_lines_teacher() {
     # Burda hocanin filelist.txt dosyasinda bulunan satirlarini siralayip, unique linelari birakiyoruz.
     local teachername=$1
     local teacherpath=~/$SETUPPATH/$teachername
+    echo "[+] make_unique_lines_teacher() fonksiyonu calistirildi."
     sort $teacherpath/filelist.txt \
             | uniq > $teacherpath/filelist_update.txt
     mv $teacherpath/filelist_update.txt $teacherpath/filelist.txt
@@ -230,6 +216,23 @@ function make_unique_lines_all_teachers() {
             | uniq > $teacherpath/filelist_update.txt
         mv $teacherpath/filelist_update.txt $teacherpath/filelist.txt
     done
+}
+function update() {
+    # Butun hocalarin dosyalarini guncellenir.
+    echo "[+] update() fonksiyonu calistirildi."
+    local status=""
+    for teachername in $(cat ~/$SETUPPATH/teachernames.txt); do
+        teacher $teachername "update"
+        [[ "$?" != "0" ]] && echo "Boyle bir hoca yok!: $teachername" && exit 1
+        # Burda updatefilelist.txt ve filelist.txt karsilastiracagiz.
+        # 2 Yontem var.
+        # method1 $teachername
+        method2 $teachername
+    done
+    # Update(-u) komutundan sonra Control(-c) komutunu da calistirmaliyiz.
+    # Cunku update komutunda sadece yeni gelen dosyalarin listesini filelist.txt dosyasina kaydediyoruz.
+    # Sonrasinda control komutuyla filelist.txt de bulunan ama dizinde bulunmayan dosyalari indiriyoruz.
+    delete_tmp_files
 }
 function control() {
     # Her hocanin filelist.txt dosyasindaki dosya, dizinin icinde var mi kontrol edilecek. Eger yoksa indirilecek.
