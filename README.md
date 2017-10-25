@@ -20,5 +20,6 @@ $ ./main.sh --help
 ```
 
 # Task listesi
+- [ ] Commitler icin Github Botu olusturulmali.
 - [ ] Daha Script kolay indirilip kullanilabilir olmali.
-- [ ] 2 kisima ayir, ilk link adreslerini ve path dosyaya kaydetsin. Sonra indirmeye baslasin.
+- [X] 2 kisima ayir, ilk link adreslerini ve path dosyaya kaydetsin. Sonra indirmeye baslasin.
