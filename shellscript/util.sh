@@ -5,24 +5,24 @@ NON_PERSONS=("fkord" "ekoord" "fkoord" "skoord" "pkoord" "lkoord" "mevkoord" "mk
 CLASSNAMES=("fileicon" "foldericon" # Parola konulmamis dosya ve dizin.
             "passwordfileicon" "passwordfoldericon") # Parolasi olan dosya ve dizin.
 DOWNLOADABLE_FILE_EXTENSIONS=("rar" "zip" "gz" "7z" "bz2" # Arsivlenmis ve Sıkıştırılmış dosyalar.
-                              "pdf" "PDF" "odp" "doc" "docx" "docm" "ppt" "pptx" "ppsx" "xls" "xlsx" # Dokumanlar
+                              "pdf" "PDF" "odp" "doc" "DOC" "docx" "docm" "ppt" "pptx" "ppsx" "xls" "xlsx" # Dokumanlar
                               "png" "jpg" "jpe" "mp3" "mp4" # Resimler, sesler ve videolar.
                               "jar" "exe" # programlar ya da kutuphaneler.
-                              "java" "cpp" "c" "asm" "pl" "sql" "backup" "txt" # Kodlar.
-                              "exp" "com" "pcapng" "iocal" "local" "option" "tif" "bmp" "ace") # digerleri
+                              "java" "cpp" "c" "asm" "pl" "sql" "txt" "xml" "html" "xhtml" "css" "js" "py" "backup" # Kodlar.
+                              "exp" "com" "pcapng" "iocal" "local" "option" "tif" "bmp" "ace" ) # digerleri
 DELETE_FILES=("source.html" "links.txt" "passwordlinks.txt" "updatefilelist.txt")
 PROFILES_URL="https://www.ce.yildiz.edu.tr/subsites"
 LINK="https://www.ce.yildiz.edu.tr/personal/"
 SETUPPATH="all-ytuce-files"
 FILENAME=""
 DIRNAME=""
-SLEEPTIME="1" # Her linkin kaynak kodunu ve Her dosya indirmeden once bekleniyecek saniye 
+SLEEPTIME="1" # Her linkin kaynak kodunu ve Her dosya indirmeden once bekleniyecek saniye
 
 function delete_tmp_files() {
     # Gecici dosyalari sil...
     echo "[+] delete_tmp_file() fonksiyonu calistirildi."
-    for deletefilename in ${DELETE_FILES[@]}; do
-         find ~/$SETUPPATH -name $deletefilename -type f -delete 2> /dev/null
+    for deletefilename in "${DELETE_FILES[@]}"; do
+         find ~/$SETUPPATH -name "${deletefilename}" -type f -delete 2> /dev/null
     done
 }
 function download_file() {
@@ -31,8 +31,8 @@ function download_file() {
     local link=$1
     local path=$2
     sleep $SLEEPTIME
-    echo $link $path
-    wget --no-check-certificate $link -O $path
+    echo "$link" "$path"
+    wget --no-check-certificate "$link" -O "$path"
 }
 function is_link_a_file() {
     # Linkin indirilebilir bir dosya olup olmadigini kontrol ediyoruz.
@@ -48,7 +48,7 @@ function is_link_a_file() {
     local link=$1
     local filename=${link##*/}
     local extension=${link##*.}
-    [ $filename == "Makefile" ] && return 34
+    [ "$filename" == "Makefile" ] && return 34
     [[ " ${DOWNLOADABLE_FILE_EXTENSIONS[@]} " == *" $extension "* ]] && return 34
     return 0
 }
@@ -56,13 +56,12 @@ function parse_link() {
     # Kaynak koddan class ismi uyusanlar hedef dosyasina yaziliyor.
     echo "[+] parse_link() fonksiyonu calistirildi."
     local sourcefile=$1
-	  local classname=$2
-	  local targetfile=$3
-	  cat $sourcefile \
-        | grep "class=\"$classname\"" \
+    local classname=$2
+    local targetfile=$3
+    grep "class=\"$classname\"" < "${sourcefile}" \
         | grep -o "$LINK.*><div" \
         | sed 's/"><div class="iconimage"><\/div><div//' \
-              >> $targetfile
+              >> "$targetfile"
 }
 function parse_all_links() {
     # Kaynak Koddan linkleri cikariyoruz.
@@ -74,9 +73,9 @@ function parse_all_links() {
     local passwordlinksfilename=$4
     for classname in "${CLASSNAMES[@]}"; do
         if [[ $classname == *"password"* ]]; then # "$classname" degiskeninin icinde "password" diye bir string var mi?
-            parse_link $path/$sourcefilename $classname $path/$passwordlinksfilename
+            parse_link "$path/$sourcefilename" "$classname" "$path/$passwordlinksfilename"
         else
-            parse_link $path/$sourcefilename $classname $path/$linksfilename
+            parse_link "$path/$sourcefilename" "$classname" "$path/$linksfilename"
         fi
     done
 }
@@ -88,7 +87,7 @@ function download_source_code() {
     local link=$1
     local path=$2
     sleep $SLEEPTIME
-    wget --no-check-certificate $link -O $path
+    wget --no-check-certificate "$link" -O "$path"
 }
 function recursive_link_follow() {
     # Recursive sekilde linklerin kaynak kodlarindaki linkleri takip edicek.
@@ -97,15 +96,15 @@ function recursive_link_follow() {
     local teachername=$2
     local link=$3
     local path=$4
-    download_source_code $link $path/source.html
-    parse_all_links $path source.html links.txt passwordlinks.txt
-    cat $path/links.txt
+    download_source_code "$link" "$path/source.html"
+    parse_all_links "$path" source.html links.txt passwordlinks.txt
+    cat "$path/links.txt"
     for href in $(cat $path/links.txt); do
         FILENAME=${href##*/}
         DIRNAME=${href##*/}
-        is_link_a_file $href
+        is_link_a_file "$href"
         if [ "$?" = "34" ]; then # Demekki indirilebilir dosya.
-            echo "Tmm indirilebilir dosya. Panpa! :" $href
+            echo "Tmm indirilebilir dosya. Panpa! :" "$href"
             if [[ "$commandname" == "init" ]]; then
                 echo $path/$FILENAME $href >> ~/$SETUPPATH/$teachername/filelist.txt
                 download_file $href $path
@@ -140,8 +139,7 @@ function get_all_teacher_names_then_save() {
     # Burdaki tum personal isimleri aliniyor. Sonra hoca olanlar "teachernames.txt" dosyasina ekleniyor.
     echo "[+] get_all_teacher_names_then_save() fonksiyonu calistirildi."
     download_source_code $PROFILES_URL ~/$SETUPPATH/personalssource.html
-    personalnames=$(cat ~/$SETUPPATH/personalssource.html \
-                 | grep -o "/personal.*><img" \
+    personalnames=$(grep -o "/personal.*><img" < ~/$SETUPPATH/personalssource.html \
                  | sed 's/"><img//' \
                  | sed 's/\/personal\///' \
                  | sort \
@@ -234,7 +232,7 @@ function update() {
     # Sonrasinda control komutuyla filelist.txt de bulunan ama dizinde bulunmayan dosyalari indiriyoruz.
     delete_tmp_files
 }
-function control() {
+function upgrade() {
     # Her hocanin filelist.txt dosyasindaki dosya, dizinin icinde var mi kontrol edilecek. Eger yoksa indirilecek.
     local filepath=""
     local filelink=""
@@ -251,14 +249,26 @@ function control() {
         done
     done
 }
+function check() {
+    for dirpath in $(find ~/$SETUPPATH -type d); do
+        local dirname=${dirpath##*/}
+        local extension=${dirname##*.}
+        if [[ " ${DOWNLOADABLE_FILE_EXTENSIONS[@]} " == *" $extension "* ]]; then
+            echo "Dirpath: ${dirpath}, Dirname: ${dirname}, Extension: ${extension}"
+            rm -r "${dirpath}"
+        fi
+    done
+    return 0
+}
 function usage() {
     echo "./main.sh "
     echo -e "\t-h --help                  : scriptin kilavuzu."
     echo -e "\t-i --init                  : butun hocalarin dosyalarini sifirdan indir."
     echo -e "\t-t --teacher [HocaninIsmi] : belli bir hocanin dosyalari indir."
     echo -e "\t--all-teacher-names        : butun hoca isimleri teachernames.txt dosyasina kaydeder."
-    echo -e "\t-u --uptate                : hocalarin dosyalari guncellenir."
-    echo -e "\t-c --control               : her hocanin filelist.txt dosyasindaki linkleri control eder."
+    echo -e "\t--update  update           : hocalarin dosyalari guncellenir."
+    echo -e "\t--upgrade upgrade          : her hocanin filelist.txt dosyasindaki linkleri control eder."
+    echo -e "\t--check check              : indirilebilir dosyalar dizin olarak mi olusturuldu?"
     echo -e "\t-f --feature               : scriptin yeni ozelligi calistirilir."
     echo -e "\t--test                     : test fonksiyonlar calistirilir."
     echo ""
