@@ -4,9 +4,9 @@
 # Description: track files in ytuce     #
 # Maintainer: undefined                 #
 # License: GPL3.0                       #
-# Version: 2.0.0                        #
+# Version: 2.0.1                        #
 #=======================================#
-source ~/Documents/pleycpl/ytuce-file-holder/shellscript/util.sh
+source "$HOME/Documents/pleycpl/ytuce-file-holder/shellscript/util.sh"
 function main() {
     local argument=$1
     local teachername=$2
@@ -18,17 +18,20 @@ function main() {
             init
         ;;
         -t | --teacher )
-            teacher $teachername "init"
+            teacher "$teachername" "init"
             [[ "$?" = "1" ]] && echo "Boyle bir hoca yok!"
         ;;
         --all-teacher-names )
             get_all_teacher_names_then_save
         ;;
-        -u | --update )
+        --update | update )
             update
         ;;
-        -c | --control )
-            control
+        --upgrade | upgrade )
+            upgrade
+        ;;
+        --check | check )
+            check
         ;;
         --test )
             test_is_link_a_file
@@ -44,4 +47,4 @@ function main() {
     esac
 }
 
-main $@
+main "$@"
